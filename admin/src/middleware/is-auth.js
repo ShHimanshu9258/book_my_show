@@ -4,7 +4,7 @@ module.exports = async (req,res,next) => {
     
     const isAuthorized = await ValidateSignature(req);
 
-    if(isAuthorized!==null){ 
+    if(isAuthorized){ 
         req.user=isAuthorized;
         return next();
     }

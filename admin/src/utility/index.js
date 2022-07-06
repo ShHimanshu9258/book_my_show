@@ -21,13 +21,12 @@ module.exports.GenerateSignature=async (payload)=>{
 
 module.exports.ValidateSignature= async(req)=>{
     const signature = req.get('Authorization');
-        // console.log(signature);
-        
         if(signature){
-            const payload = await jwt.verify(signature.split(' ')[1], APP_SECRET);   
-            return true;
+            const payload = await jwt.verify(signature.split(' ')[1], APP_SECRET);  
+            // console.log(payload); 
+            return payload;
         }
-        return false;
+        return null;
 };
 
 
