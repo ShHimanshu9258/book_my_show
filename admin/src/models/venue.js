@@ -10,6 +10,17 @@ const venueSchema=new Schema({
         type:Number,
         required:true
     },
+    timing:{
+        type:Object,
+        required:true
+     },
+     cancelEvent:{
+        type:Boolean,
+        default:false
+     },
+     postponeEvent:[{
+        type:Date
+     }],
     venueLocation:[{
         type: mongoose.SchemaTypes.ObjectId,
         ref:'address',
