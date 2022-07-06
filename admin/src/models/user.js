@@ -25,8 +25,7 @@ const userSchema=new Schema({
     },
     roles:{
         type:String,
-        default:superAdmin
-       
+        default:venueAdmin
     },
     address:{
         type:Object,

@@ -2,6 +2,9 @@ const bcrypt=require('bcryptjs');
 const jwt=require('jsonwebtoken');
 const dotenv=require('dotenv').config;
 
+// importing models
+const User=require('../models/user');
+
 const APP_SECRET=`${process.env.APP_SECRET}`
 module.exports.GenerateSalt= async() =>{
    return await bcrypt.genSalt();
@@ -29,4 +32,35 @@ module.exports.ValidateSignature= async(req)=>{
         return null;
 };
 
+module.exports.GetDataAccordingRole=async(role)=>{
+    try{
+        const users=await User.find();
+        if(users){
+            let resultArray=[];
+                resultArray=users.filter(users=>{
+                    if(users.roles===role){
+                      return  resultArray.push(users);
+                    }
+            });
+            return resultArray;
+        }
+        return null;
+    }   
+    catch(error){
+        console.log(error);
+    }
+};
+
+module.exports.GetDataById=async (id)=>{
+    try{
+        const user=await User.findById(id);
+        if(user){
+            return user;
+        }
+        return null;
+    }
+    catch(error){
+        console.log(error);
+    }
+}
 
