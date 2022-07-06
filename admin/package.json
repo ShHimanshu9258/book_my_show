@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"node src/index.js"
+    "start": "nodemon src/index.js"
   },
   "author": "Himanshu sharma",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "express": "^4.18.1",
+    "nodemon": "^2.0.19"
+  }
 }
