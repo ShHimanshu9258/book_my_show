@@ -1,5 +1,5 @@
 const User=require('../models/user');
-const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole} = require('../utility');
+const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole,GetDataByEmail} = require('../utility');
 
 module.exports.GetAdmin=async (req,res,next)=>{
     try{
@@ -7,7 +7,7 @@ module.exports.GetAdmin=async (req,res,next)=>{
         if(adminResult){
             return res.status(200).json(adminResult);
         }
-        
+        return res.status(400).json({message:'No Data found'});
     }
     catch(error){
         console.log(error);
@@ -17,21 +17,26 @@ module.exports.GetAdmin=async (req,res,next)=>{
 module.exports.CreateAdmin=async (req,res,next)=>{
     try{
         const {email,password,address,name,phone}= req.body;
-        const salt=await GenerateSalt();
-        const userPassword=await GeneratePassword(password,salt);
-        const user=new User({
-            email:email,
-            phone:phone,
-            address:address,
-            name:name,
-            password:userPassword,
-            serviceProvides:[],
-            salt:salt
-        });
-        const result=await user.save();
-       if(result){
-            return res.status(201).json(result);
-       }
+        const existingUser=await GetDataByEmail(email);
+        if(!existingUser){
+            const salt=await GenerateSalt();
+            const userPassword=await GeneratePassword(password,salt);
+            const user=new User({
+                email:email,
+                phone:phone,
+                address:address,
+                name:name,
+                password:userPassword,
+                serviceProvides:[],
+                salt:salt
+            });
+            const result=await user.save();
+            if(result){
+                return res.status(201).json(result);
+            }
+        }
+        return res.status(422).json({message:'User is alerdy registerd'});
+        
     }
     catch(error){
         console.log(error);
@@ -41,7 +46,7 @@ module.exports.CreateAdmin=async (req,res,next)=>{
 module.exports.UserSignIn=async (req,res,next)=>{
     try{
         const {email,password}=req.body;
-        const user=await User.findOne({email:email});
+        const user=await GetDataByEmail(email);
         if(user){
             const validPassword= await ValidatePassword(password,user.password,user.salt);
                 if(validPassword){
@@ -69,3 +74,17 @@ module.exports.GetVenueAdmin=async(req,res,next)=>{
         console.log(error);
     }
 };
+
+module.exports.UpdateVenueLocation=async(req,res,next)=>{
+
+};
+
+module.exports.AddVenue=async(req,res,next)=>{
+    try{
+        const id=req.params.id;
+        const {}=req.body;
+    }
+    catch(error){
+        console.log(error);
+    }
+}
