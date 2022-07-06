@@ -1,6 +1,5 @@
 const express=require('express');
+const {GetAdmin}=require('../controller/admin-controller');
 const router=express.Router();
-router.get('/',(req,res,next)=>{
-    res.json({message:'testing api'});
-});
+router.get('/',GetAdmin);
 module.exports=router;
