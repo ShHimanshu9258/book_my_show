@@ -3,6 +3,7 @@ const bodyParser=require('body-parser');
 
 // importing routes
 const AdminRoutes=require('./routes/admin-routes');
+const { PORT } = require('./config');
 const app=express();
 
 app.use(bodyParser.json());
@@ -10,7 +11,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 
 app.use(AdminRoutes);
-app.listen(3000,()=>{
+app.listen(PORT,()=>{
     console.log(`app listen to 3000  port`);
 })
 .on('error', (err) => {
