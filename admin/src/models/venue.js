@@ -8,14 +8,15 @@ const venueSchema=new Schema({
     },
     registrationId:{
         type:Number,
-        required:true
+        required:true,
+        unique:true
     },
     timing:{
         type:Object,
         required:true
      },
      cancelEvent:{
-        type:Boolean,
+        type:mongoose.SchemaTypes.Boolean,
         default:false
      },
      postponeEvent:[{

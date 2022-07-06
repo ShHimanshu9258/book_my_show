@@ -28,6 +28,10 @@ const userSchema=new Schema({
         default:admin
        
     },
+    address:{
+        type:Object,
+        required:true
+    },
     serviceProvides:[{
         type: mongoose.SchemaTypes.ObjectId,
         ref:'venue',
@@ -52,5 +56,4 @@ const userSchema=new Schema({
         timestamps:true
     }
 );
-
 module.exports=mongoose.model('user',userSchema);
