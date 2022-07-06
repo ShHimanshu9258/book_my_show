@@ -1,8 +1,12 @@
 const express=require('express');
 const {GetAdmin,CreateAdmin, UserSignIn}=require('../controller/admin-controller');
 const router=express.Router();
+const isAuth=require('../middleware/is-auth');
+const isSuperAdmin=require('../middleware/is-superAdmin');
+
+
 // getting admin
-router.get('/get-admin',GetAdmin);
+router.get('/get-admin',isAuth,isSuperAdmin,GetAdmin);
 
 // creating admin
 router.post('/create-admin',CreateAdmin);
