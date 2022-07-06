@@ -30,10 +30,4 @@ module.exports.ValidateSignature= async(req)=>{
         return false;
 };
 
-module.exports.FormateData = (data) => {
-    if(data){
-        return { data }
-    }else{
-        throw new Error('Data Not found!')
-    }
-}
+
