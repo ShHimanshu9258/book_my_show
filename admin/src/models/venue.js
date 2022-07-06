@@ -27,6 +27,11 @@ const venueSchema=new Schema({
         ref:'address',
         required:true
     }],
+    serviceAvailable:{
+        type:mongoose.SchemaTypes.Boolean,
+        default:false,
+        required:true
+    },
     event:[{
         type: mongoose.SchemaTypes.ObjectId,
         ref:'event',

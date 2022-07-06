@@ -31,16 +31,7 @@ const userSchema=new Schema({
         type:Object,
         required:true
     },
-    serviceProvides:[{
-        type: mongoose.SchemaTypes.ObjectId,
-        ref:'venue',
-        required:true
-    }],
-    serviceAvailable:{
-        type:mongoose.SchemaTypes.Boolean,
-        default:false,
-        required:true
-    }
+   
 },
     {
         toJSON:{

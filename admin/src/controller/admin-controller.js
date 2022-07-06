@@ -1,5 +1,6 @@
 const User=require('../models/user');
-const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole,GetDataByEmail} = require('../utility');
+const Venue = require('../models/venue');
+const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole,GetDataByEmail, GetDataById} = require('../utility');
 
 module.exports.GetAdmin=async (req,res,next)=>{
     try{
@@ -27,7 +28,6 @@ module.exports.CreateAdmin=async (req,res,next)=>{
                 address:address,
                 name:name,
                 password:userPassword,
-                serviceProvides:[],
                 salt:salt
             });
             const result=await user.save();
@@ -82,7 +82,34 @@ module.exports.UpdateVenueLocation=async(req,res,next)=>{
 module.exports.AddVenue=async(req,res,next)=>{
     try{
         const id=req.params.id;
-        const {}=req.body;
+        const {venueType,registrationId,timing}=req.body;
+        const existingVenue=await Venue.findOne({registrationId:registrationId});
+        if(!existingVenue){
+            const venue=new Venue({
+                venueType:venueType,
+                registrationId:registrationId,
+                timing:timing,
+                postponeEvent:[],
+                venueLocation:[],
+                event:[]
+            });
+            const result=await venue.save();
+            if(result){
+                return res.status(201).json(result);
+            }
+            return res.status(422).json({message:'Venue not cretaed please try again'});
+        }
+        return res.status(422).json({message:'Venue is already registed with this registration number please try different one'});
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+module.exports.AddEvent=async(req,res,next)=>{
+    try{
+        const id=req.params.id;
+
     }
     catch(error){
         console.log(error);
