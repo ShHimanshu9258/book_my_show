@@ -13,6 +13,7 @@ const eventSchema=new Schema({
     },
     seatAvailability:{
         type:mongoose.SchemaTypes.Boolean,
+        default:false,
         required:true 
      },
      totalSeats:{
@@ -29,6 +30,13 @@ const eventSchema=new Schema({
      },
      
 },{
+    toJSON:{
+        transform(doc,ret){
+            delete ret.__v;
+            delete ret.updatedAt;
+            delete ret.createdAt;
+        }
+    },
     timestamps:true
 });
 module.exports=mongoose.model('event',eventSchema);

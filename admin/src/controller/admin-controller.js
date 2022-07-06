@@ -1,5 +1,7 @@
 const User=require('../models/user');
 const Venue = require('../models/venue');
+const Event=require('../models/event');
+const {admin,superAdmin,venueAdmin}=require('../models/roles');
 const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole,GetDataByEmail, GetDataById} = require('../utility');
 
 module.exports.GetAdmin=async (req,res,next)=>{
@@ -28,7 +30,8 @@ module.exports.CreateAdmin=async (req,res,next)=>{
                 address:address,
                 name:name,
                 password:userPassword,
-                salt:salt
+                salt:salt,
+                roles:admin
             });
             const result=await user.save();
             if(result){
@@ -81,7 +84,6 @@ module.exports.UpdateVenueLocation=async(req,res,next)=>{
 
 module.exports.AddVenue=async(req,res,next)=>{
     try{
-        const id=req.params.id;
         const {venueType,registrationId,timing}=req.body;
         const existingVenue=await Venue.findOne({registrationId:registrationId});
         if(!existingVenue){
@@ -109,7 +111,29 @@ module.exports.AddVenue=async(req,res,next)=>{
 module.exports.AddEvent=async(req,res,next)=>{
     try{
         const id=req.params.id;
-
+        const {event,imdbId,totalSeats,remaningAvailableSeats,ratings}=req.body;
+        const venue=await Venue.findById(id);
+        const existingEvent=await Event.findOne({imdbId:imdbId});
+        if(venue!==null && existingEvent===null){
+            const eventModel=new Event({
+                event:event,
+                imdbId:imdbId,
+                totalSeats:totalSeats,
+                remaningAvailableSeats:remaningAvailableSeats,
+                ratings:ratings
+            });
+            const eventResult=await eventModel.save();
+            if(eventResult){
+                venue.event.push(eventResult);
+                const venueResult=await venue.save();
+                if(venueResult){
+                    return res.status(201).json(venueResult);
+                }
+                return res.json({message:'OOPS!! Venue table not updated...'});
+            }
+            return res.json({message:'No Data inserted into event table'});
+        }
+        return res.json({message:'Event is already generated with this id...'});
     }
     catch(error){
         console.log(error);

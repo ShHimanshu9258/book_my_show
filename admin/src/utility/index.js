@@ -66,7 +66,7 @@ module.exports.GetDataById=async (id)=>{
 
 module.exports.GetDataByEmail= async(email)=>{
     try{
-        const user=await User.findOne({emil:email});
+        const user=await User.findOne({email:email});
         if(user){
             return user;
         }
