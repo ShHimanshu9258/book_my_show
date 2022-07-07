@@ -5,6 +5,7 @@ const dotenv=require('dotenv').config;
 // importing models
 const User=require('../models/user');
 
+
 const APP_SECRET=`${process.env.APP_SECRET}`
 module.exports.GenerateSalt= async() =>{
    return await bcrypt.genSalt();

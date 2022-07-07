@@ -24,6 +24,17 @@ const eventSchema=new Schema({
          type:Number,
          required:true
      },
+     timing:{
+        type:Object,
+        required:true
+     },
+     cancelEvent:{
+        type:mongoose.SchemaTypes.Boolean,
+        default:false
+     },
+     postponeEvent:[{
+        type:Date
+     }],
      ratings:{
          type:Number,
          required:true

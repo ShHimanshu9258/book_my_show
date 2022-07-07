@@ -1,5 +1,6 @@
 const User=require('../models/user');
 const {GetDataById}=require('../utility');
+const {admin}=require('../models/roles');
 module.exports=async (req,res,next)=>{
     try{
         const user=req.user;
@@ -7,7 +8,7 @@ module.exports=async (req,res,next)=>{
             const userResult=await GetDataById(user.id,User);
             if(userResult){
                 console.log(userResult.roles);
-                if(userResult.roles==='admin'){
+                if(userResult.roles===admin){
                     return next();
                 }
                 return res.status(404).json({message:'Your are not admin to perform this action'});
