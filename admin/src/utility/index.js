@@ -51,9 +51,9 @@ module.exports.GetDataAccordingRole=async(role)=>{
     }
 };
 
-module.exports.GetDataById=async (id)=>{
+module.exports.GetDataById=async (id,Table)=>{
     try{
-        const user=await User.findById(id);
+        const user=await Table.findById(id);
         if(user){
             return user;
         }
@@ -64,9 +64,9 @@ module.exports.GetDataById=async (id)=>{
     }
 }
 
-module.exports.GetDataByEmail= async(email)=>{
+module.exports.GetDataByEmail= async(email,Table)=>{
     try{
-        const user=await User.findOne({email:email});
+        const user=await Table.findOne({email:email});
         if(user){
             return user;
         }
@@ -77,9 +77,10 @@ module.exports.GetDataByEmail= async(email)=>{
     }
 }
 
-module.exports.RemoveDataById= async (id)=>{
+module.exports.RemoveDataById= async (id,Table)=>{
     try{
-        const result=await User.findByIdAndRemove(id);
+        console.log(Table);
+        const result=await Table.findByIdAndRemove(id);
         if(result){
             return result;
         }

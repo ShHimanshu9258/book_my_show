@@ -1,6 +1,7 @@
 const User=require('../models/user');
 const Venue = require('../models/venue');
 const Event=require('../models/event');
+const Address=require('../models/address');
 const {admin,superAdmin,venueAdmin}=require('../models/roles');
 const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole,GetDataByEmail, GetDataById, RemoveDataById} = require('../utility');
 
@@ -22,7 +23,7 @@ module.exports.GetAdmin=async (req,res,next)=>{
 module.exports.CreateAdmin=async (req,res,next)=>{
     try{
         const {email,password,address,name,phone}= req.body;
-        const existingUser=await GetDataByEmail(email);
+        const existingUser=await GetDataByEmail(email,User);
         if(!existingUser){
             const salt=await GenerateSalt();
             const userPassword=await GeneratePassword(password,salt);
@@ -33,7 +34,7 @@ module.exports.CreateAdmin=async (req,res,next)=>{
                 name:name,
                 password:userPassword,
                 salt:salt,
-                roles:admin
+                roles:venueAdmin
             });
             const result=await user.save();
             if(result){
@@ -51,7 +52,7 @@ module.exports.CreateAdmin=async (req,res,next)=>{
 module.exports.UserSignIn=async (req,res,next)=>{
     try{
         const {email,password}=req.body;
-        const user=await GetDataByEmail(email);
+        const user=await GetDataByEmail(email,User);
         if(user){
             const validPassword= await ValidatePassword(password,user.password,user.salt);
                 if(validPassword){
@@ -83,8 +84,9 @@ module.exports.GetVenueAdmin=async(req,res,next)=>{
 module.exports.UpdateVenueLocation=async(req,res,next)=>{
     try{
         const id=req.params.id;
+        console.log();
         const {city,state,pincode,country,landmark}=req.body;
-        const venue=await Venue.findById(id);
+        const venue=await GetDataById(id,Venue);
         if(venue){
             const address=new Address({
                 city:city,
@@ -141,7 +143,7 @@ module.exports.AddEvent=async(req,res,next)=>{
     try{
         const id=req.params.id;
         const {event,imdbId,totalSeats,remaningAvailableSeats,ratings}=req.body;
-        const venue=await Venue.findById(id);
+        const venue=await GetDataById(id,Venue);
         const existingEvent=await Event.findOne({imdbId:imdbId});
         if(venue!==null && existingEvent===null){
             const eventModel=new Event({
@@ -172,7 +174,7 @@ module.exports.AddEvent=async(req,res,next)=>{
 module.exports.RemoveAdminById=async (req,res,next)=>{
     try{
         const id=req.params.id;
-        const result=await RemoveDataById(id);
+        const result=await RemoveDataById(id,User);
         if(result){
             return res.status(200).json(result);
         }
@@ -186,7 +188,7 @@ module.exports.RemoveAdminById=async (req,res,next)=>{
 module.exports.RemoveVenueById=async(req,res,next)=>{
     try{
         const id=req.params.id;
-        const result=await RemoveDataById(id);
+        const result=await RemoveDataById(id,Venue);
         if(result){
             return res.status(200).json(result);
         }
