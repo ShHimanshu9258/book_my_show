@@ -1,8 +1,7 @@
 const express=require('express');
+const {GetUsers}=require('../controller/user-controller');
 const router=express.Router();
 
-router.use('/',(req,res,next)=>{
-    return res.json({message:'express api testing'});
-});
+router.get('/',GetUsers);
 
 module.exports=router;
