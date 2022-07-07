@@ -4,6 +4,7 @@ const mongoose=require('mongoose');
 const dotenv=require('dotenv').config();
 // importing routes
 const AdminRoutes=require('./routes/admin-routes');
+const VenueAdminRoutes=require('./routes/venue-routes');
 
 const app=express();
 
@@ -17,6 +18,9 @@ const MONGODB_URI =
 
 
 app.use(AdminRoutes);
+app.use(VenueAdminRoutes);
+
+
  mongoose.connect(MONGODB_URI).then(()=>{
     app.listen(PORT,()=>{
         console.log('connected to db');
