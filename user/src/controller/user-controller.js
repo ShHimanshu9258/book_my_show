@@ -1,3 +1,5 @@
+const User=require('../models/user');
+
 module.exports.GetUsers=async(req,res,next)=>{
     try{
         return res.json({message:'express api testing'});
@@ -9,14 +11,17 @@ module.exports.GetUsers=async(req,res,next)=>{
 
 module.exports.CreteUser=async(req,res,next)=>{
     try{
-         const {email,password,address,name,phone}= req.body;
-         return res.status(201).json({
+         const {email,password,name,phone}= req.body;
+         const user=new User({
             email:email,
             phone:phone,
-            address:address,
+            address:[],
             name:name,
-            password:password
+            password:password,
+            salt:'somesalt'
          });
+         const result=await user.save();
+         return res.status(201).json(result);
     }
     catch(error){
         console.log(error);
