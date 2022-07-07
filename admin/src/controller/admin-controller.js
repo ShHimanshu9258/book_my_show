@@ -81,7 +81,34 @@ module.exports.GetVenueAdmin=async(req,res,next)=>{
 };
 
 module.exports.UpdateVenueLocation=async(req,res,next)=>{
-
+    try{
+        const id=req.params.id;
+        const {city,state,pincode,country,landmark}=req.body;
+        const venue=await Venue.findById(id);
+        if(venue){
+            const address=new Address({
+                city:city,
+                state:state,
+                country:country,
+                pincode:pincode,
+                landmark:landmark
+            });
+            const result=await address.save();
+            if(result){
+                venue.venueLocation.push(result);
+                const venueResult=await venue.save();
+                if(venueResult){
+                    return res.status(201).json(venueResult);
+                }
+                return res.json({message:'No Venue updated ...'});
+            }
+            return res.json({message:'No Location updtaed please try again'});
+        }
+        return res.json({message:'No venue available with this id...'});
+    }
+    catch(error){
+        console.log(error);
+    }
 };
 
 module.exports.AddVenue=async(req,res,next)=>{
