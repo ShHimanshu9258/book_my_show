@@ -21,6 +21,18 @@ app.use(AdminRoutes);
 app.use(VenueAdminRoutes);
 
 
+// handling global errors
+app.use((error, req, res, next) => {
+    const status = error.statusCode || 500;
+    const message = error.message;
+    const data = error.data;
+    res.status(status).json({
+       message: message,
+      data: data,
+    status:status
+   });
+  });
+
  mongoose.connect(MONGODB_URI).then(()=>{
     app.listen(PORT,()=>{
         console.log('connected to db');

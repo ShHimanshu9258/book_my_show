@@ -1,14 +1,16 @@
 const User=require('../models/user');
-const {GeneratePassword,GenerateSalt,GenerateSignature, GetDataByEmail, ValidatePassword}=require('../utility');
-module.exports.GetUsers=async(req,res,next)=>{
+const Address=require('../models/address');
+const {GeneratePassword,GenerateSalt,GenerateSignature, GetDataByEmail, ValidatePassword, GetDataById}=require('../utility');
+
+module.exports.GetUserProfileById=async(req,res,next)=>{
     try{
-        const users=await User.find();
-        if(!users){
-            const error=new Error('No users find inside db');
+        const user=await GetDataById(req.user.id,User)
+        if(!user){
+            const error=new Error('No user find inside db');
             error.statusCode=422;
             throw error;
         }
-        return res.status(200).json(users);
+        return res.status(200).json(user);
     }
     catch(error){
         if(!error.statusCode){
@@ -71,6 +73,58 @@ module.exports.UserSignIn= async(req,res,next)=>{
         }
         const token = await GenerateSignature({ email: user.email, id: user._id});
         return res.status(201).json({id: user._id, token });
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+
+module.exports.UpdateAddress=async(req,res,next)=>{
+    try{
+        const existingUser=await GetDataById(req.user.id,User);
+        const {city,state,country,pincode,landmark}=req.body;
+
+        if(!existingUser){
+            const error=new Error('No user exist with this id');
+            error.statusCode=422;
+            throw error;
+        }
+        const address=new Address({
+            city:city,
+            pincode:pincode,
+            landmark:landmark,
+            country:country,
+            state:state
+        });
+        const addressResult=await address.save();
+        if(!addressResult){
+            const error=new Error('OOPS!! Error occured no data inserted into db');
+            error.statusCode=422;
+            throw error;
+        }
+        existingUser.address.push(addressResult);
+        const user=await existingUser.save();
+        if(!user){
+            const error=new Error('OOPS!! Error occured user table not updated');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(201).json(user);
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+};
+
+module.exports.GetSeatAvailability=async(req,res,next)=>{
+    try{
+        
     }
     catch(error){
         if(!error.statusCode){
