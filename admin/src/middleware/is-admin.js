@@ -1,10 +1,10 @@
 const User=require('../models/user');
-
+const {GetDataById}=require('../utility');
 module.exports=async (req,res,next)=>{
     try{
         const user=req.user;
         if(user){
-            const userResult=await User.findById(user.id);
+            const userResult=await GetDataById(user.id,User);
             if(userResult){
                 console.log(userResult.roles);
                 if(userResult.roles==='admin'){
