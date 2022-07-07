@@ -13,8 +13,12 @@ module.exports.CreteUser=async(req,res,next)=>{
     try{
          const {email,password,name,phone}= req.body;
          const existingUser=await GetDataByEmail(email,User);
-         if(!existingUser){
-            const salt=await GenerateSalt();
+         if(existingUser){
+            const error=new Error('user is already exist with this email');
+            error.statusCode=422;
+            throw error;
+         }
+         const salt=await GenerateSalt();
             const userPassword=await GeneratePassword(password,salt);
             const user=new User({
                 email:email,
@@ -25,16 +29,18 @@ module.exports.CreteUser=async(req,res,next)=>{
                 salt:salt
              });
              const result=await user.save();
-             if(result){
-                return res.status(201).json(result);
+             if(!result){
+                const error=new Error('No user added inside database');
+                error.statusCode=422;
+                throw error;
              }
-             return res.status(422).json({message:'No user added inside database'});
-             
-         }
-         return res.status(422).json({message:'user is already exist with this email'});
-         
+             const token = await GenerateSignature({ email: result.email, id: result._id});
+             return res.status(200).json({id: result._id, token });
     }
     catch(error){
-        console.log(error);
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
     }
 }

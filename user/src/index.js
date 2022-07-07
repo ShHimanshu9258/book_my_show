@@ -20,6 +20,18 @@ const MONGODB_URI =
 // using routes
 app.use(UserRoutes);
 
+// handling global errors
+app.use((error, req, res, next) => {
+    console.log(error);
+    const status = error.statusCode || 500;
+    const message = error.message;
+    const data = error.data;
+    res.status(status).json({
+       message: message,
+      data: data,
+    status:status
+   });
+  });
 
 //db connection
 mongoose.connect(MONGODB_URI).then(()=>{
