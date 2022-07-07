@@ -182,3 +182,16 @@ module.exports.RemoveAdminById=async (req,res,next)=>{
         console.log(error);
     }
 }
+
+module.exports.RemoveVenueById=async(req,res,next)=>{
+    try{
+        const id=req.params.id;
+        const result=await RemoveDataById(id);
+        if(result){
+            return res.status(200).json(result);
+        }
+        return res.status(400).json({message:'No data removed'});
+    }catch(error){
+        console.log(error);
+    }
+}
