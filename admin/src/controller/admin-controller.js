@@ -2,7 +2,9 @@ const User=require('../models/user');
 const Venue = require('../models/venue');
 const Event=require('../models/event');
 const {admin,superAdmin,venueAdmin}=require('../models/roles');
-const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole,GetDataByEmail, GetDataById} = require('../utility');
+const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole,GetDataByEmail, GetDataById, RemoveDataById} = require('../utility');
+
+
 
 module.exports.GetAdmin=async (req,res,next)=>{
     try{
@@ -134,6 +136,20 @@ module.exports.AddEvent=async(req,res,next)=>{
             return res.json({message:'No Data inserted into event table'});
         }
         return res.json({message:'Event is already generated with this id...'});
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+module.exports.RemoveAdminById=async (req,res,next)=>{
+    try{
+        const id=req.params.id;
+        const result=await RemoveDataById(id);
+        if(result){
+            return res.status(200).json(result);
+        }
+        return res.status(400).json({message:'No data removed'});
     }
     catch(error){
         console.log(error);

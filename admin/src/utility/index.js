@@ -77,3 +77,16 @@ module.exports.GetDataByEmail= async(email)=>{
     }
 }
 
+module.exports.RemoveDataById= async (id)=>{
+    try{
+        const result=await User.findByIdAndRemove(id);
+        if(result){
+            return result;
+        }
+        return null;
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+

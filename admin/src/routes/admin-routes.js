@@ -1,5 +1,5 @@
 const express=require('express');
-const {GetAdmin,CreateAdmin, UserSignIn, GetVenueAdmin,AddVenue, AddEvent}=require('../controller/admin-controller');
+const {GetAdmin,CreateAdmin, UserSignIn, GetVenueAdmin,AddVenue, AddEvent, RemoveAdminById}=require('../controller/admin-controller');
 const router=express.Router();
 const isAuth=require('../middleware/is-auth');
 const isSuperAdmin=require('../middleware/is-superadmin');
@@ -21,5 +21,7 @@ router.get('/get-venderAdmin',isAuth,GetVenueAdmin);
 // adding venue by admin
 router.post('/create-venue-byadmin',isAuth,isAdmin,AddVenue);
 router.post('/create-event-byadmin/:id',isAuth,isAdmin,AddEvent);
+
+router.delete('/remove-adminbyid/:id',isAuth,isSuperAdmin,RemoveAdminById)
 
 module.exports=router;
