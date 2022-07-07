@@ -1,8 +1,7 @@
 const express=require('express');
 const app=express();
+const UserRoutes=require('./routes/user-routes');
 
-app.use('/',(req,res,next)=>{
-    return res.json({message:'express api testing'});
-});
+app.use(UserRoutes);
 
 app.listen(4000);
