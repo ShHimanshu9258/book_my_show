@@ -1,5 +1,13 @@
 const express=require('express');
-const {GetUserProfileById,CreteUser, UserSignIn, UpdateAddress,GetSeatAvailability, GettingUsersData}=require('../controller/user-controller');
+const {
+    GetUserProfileById,
+    CreteUser, 
+    UserSignIn, 
+    UpdateAddress,
+    GetSeatAvailability, 
+    GettingUsersData, 
+    RemoveUserFromDatabase
+}=require('../controller/user-controller');
 const router=express.Router();
 const isAuth=require('../middleware/is-Auth');
 
@@ -13,5 +21,7 @@ router.post('/user-login',UserSignIn);
 
 
 router.patch('/update-address',isAuth,UpdateAddress);
+
+router.delete('/removeuserbyid/:id',RemoveUserFromDatabase);
 
 module.exports=router;

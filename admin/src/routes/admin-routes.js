@@ -1,5 +1,16 @@
 const express=require('express');
-const {GetAdmin,CreateAdmin, UserSignIn, GetVenueAdmin,AddVenueDetails, RemoveAdminById, UpdateVenueLocation, RemoveVenueById, GettingUserFromUserPortal}=require('../controller/admin-controller');
+const {
+    GetAdmin,
+    CreateAdmin,
+    UserSignIn, 
+    GetVenueAdmin,
+    AddVenueDetails, 
+    RemoveAdminById, 
+    UpdateVenueLocation, 
+    RemoveVenueById, 
+    GettingUserFromUserPortal, 
+    RemoveUserFromUserService
+}=require('../controller/admin-controller');
 const router=express.Router();
 const isAuth=require('../middleware/is-auth');
 const isSuperAdmin=require('../middleware/is-superadmin');
@@ -27,6 +38,7 @@ router.patch('/update-location-byadmin/:id',isAuth,isAdmin,UpdateVenueLocation);
 
 
 router.delete('/remove-adminbyid/:id',isAuth,isSuperAdmin,RemoveAdminById);
-router.delete('/remove-venuebyid/:id',isAuth,isAdmin,RemoveVenueById)
+router.delete('/remove-venuebyid/:id',isAuth,isAdmin,RemoveVenueById);
+router.delete('/remove-userbyid/:id',isAuth,isAdmin,RemoveUserFromUserService);
 
 module.exports=router;

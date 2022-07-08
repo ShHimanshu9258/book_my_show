@@ -1,6 +1,6 @@
 const User=require('../models/user');
 const Address=require('../models/address');
-const {GeneratePassword,GenerateSalt,GenerateSignature, GetDataByEmail, ValidatePassword, GetDataById}=require('../utility');
+const {GeneratePassword,GenerateSalt,GenerateSignature, GetDataByEmail, ValidatePassword, GetDataById, RemoveDataById}=require('../utility');
 const axios=require('axios');
 const dotenv=require('dotenv').config();
 
@@ -167,3 +167,26 @@ module.exports.GettingUsersData= async(req,res,next)=>{
         next(error);
     }
 }
+
+module.exports.RemoveUserFromDatabase=async(req,res,next)=>{
+    try{
+        const result=await RemoveDataById(req.params.id,User);
+        if(!result){
+            const error=new Error('No data find with this id,Use different one');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json({
+            message:'User deleted successfull...',
+            id:result._id,
+            name:result.name
+        });
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+

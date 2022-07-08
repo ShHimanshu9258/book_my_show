@@ -235,3 +235,22 @@ module.exports.GettingUserFromUserPortal= async(req,res,next)=>{
         next(error);
     }
 }
+
+module.exports.RemoveUserFromUserService=async(req,res,next)=>{
+    try{
+        const id=req.params.id;
+        const response=await axios.delete(`http://localhost:4002/removeuserbyid/${id}`);
+        if(response===null){
+            const error=new Error('No record found please try again');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json(response.data);
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
