@@ -130,9 +130,25 @@ module.exports.GetSeatAvailability=async(req,res,next)=>{
         if(response===null){
             const error=new Error('No revord find with this id');
         }
-        console.log(response.data);
         return res.status(200).json(response.data);
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
 
+module.exports.GettingUsersData= async(req,res,next)=>{
+    try{
+        const users=await User.find();
+        if(!users){
+            const error=new Error('No record found please try again');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json(users);
     }
     catch(error){
         if(!error.statusCode){

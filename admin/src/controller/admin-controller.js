@@ -3,7 +3,7 @@ const Event=require('../models/event');
 const Address=require('../models/address');
 const {admin,superAdmin,venueAdmin}=require('../models/roles');
 const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole,GetDataByEmail, GetDataById, RemoveDataById} = require('../utility');
-
+const axios=require('axios');
 
 
 module.exports.GetAdmin=async (req,res,next)=>{
@@ -181,38 +181,6 @@ module.exports.AddVenueDetails=async(req,res,next)=>{
     }
 }
 
-// module.exports.AddEvent=async(req,res,next)=>{
-//     try{
-//         const id=req.params.id;
-//         const {event,imdbId,totalSeats,remaningAvailableSeats,ratings}=req.body;
-//         const venue=await GetDataById(id,Venue);
-//         const existingEvent=await Event.findOne({imdbId:imdbId});
-//         if(venue!==null && existingEvent===null){
-//             const eventModel=new Event({
-//                 event:event,
-//                 imdbId:imdbId,
-//                 totalSeats:totalSeats,
-//                 remaningAvailableSeats:remaningAvailableSeats,
-//                 ratings:ratings
-//             });
-//             const eventResult=await eventModel.save();
-//             if(eventResult){
-//                 venue.event.push(eventResult);
-//                 const venueResult=await venue.save();
-//                 if(venueResult){
-//                     return res.status(201).json(venueResult);
-//                 }
-//                 return res.json({message:'OOPS!! Venue table not updated...'});
-//             }
-//             return res.json({message:'No Data inserted into event table'});
-//         }
-//         return res.json({message:'Event is already generated with this id...'});
-//     }
-//     catch(error){
-//         console.log(error);
-//     }
-// }
-
 module.exports.RemoveAdminById=async (req,res,next)=>{
     try{
         const id=req.params.id;
@@ -243,6 +211,24 @@ module.exports.RemoveVenueById=async(req,res,next)=>{
         }
         return res.status(200).json(result);
     }catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+
+module.exports.GettingUserFromUserPortal= async(req,res,next)=>{
+    try{
+        const response=await axios.get(`http://localhost:4002/get-userdata`);
+        if(response===null){
+            const error=new Error('No record found please try again');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json(response.data);
+    }
+    catch(error){
         if(!error.statusCode){
             error.statusCode=500;
         }

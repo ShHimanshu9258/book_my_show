@@ -1,5 +1,5 @@
 const express=require('express');
-const {GetAdmin,CreateAdmin, UserSignIn, GetVenueAdmin,AddVenueDetails, RemoveAdminById, UpdateVenueLocation, RemoveVenueById}=require('../controller/admin-controller');
+const {GetAdmin,CreateAdmin, UserSignIn, GetVenueAdmin,AddVenueDetails, RemoveAdminById, UpdateVenueLocation, RemoveVenueById, GettingUserFromUserPortal}=require('../controller/admin-controller');
 const router=express.Router();
 const isAuth=require('../middleware/is-auth');
 const isSuperAdmin=require('../middleware/is-superadmin');
@@ -8,6 +8,9 @@ const isAdmin=require('../middleware/is-admin');
 
 // getting admin
 router.get('/get-admin',isAuth,isSuperAdmin,GetAdmin);
+
+// getting user data from another service
+router.get('/get-userdata',isAuth,isAdmin,GettingUserFromUserPortal);
 
 // creating admin
 router.post('/create-admin',CreateAdmin);
