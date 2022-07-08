@@ -1,6 +1,9 @@
 const bcrypt=require('bcryptjs');
 const jwt=require('jsonwebtoken');
-const dotenv=require('dotenv').config;
+const dotenv=require('dotenv').config();
+
+// declare global variables
+const RECORDS_PER_PAGE=`${process.env.RECORDS_PER_PAGE}`;
 
 // importing models
 const User=require('../models/user');

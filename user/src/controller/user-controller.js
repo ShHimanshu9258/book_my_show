@@ -134,6 +134,8 @@ module.exports.GetSeatAvailability=async(req,res,next)=>{
         const response=await axios.get(`http://localhost:3002/venue-seatavailable/${id}`);
         if(response===null){
             const error=new Error('No revord find with this id');
+            error.statusCode=422;
+            throw error;
         }
         return res.status(200).json(response.data);
     }
@@ -181,6 +183,25 @@ module.exports.RemoveUserFromDatabase=async(req,res,next)=>{
             id:result._id,
             name:result.name
         });
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+
+module.exports.GettingVenues=async(req,res,next)=>{
+    try{
+        console.log('inside getting user');
+        const response=await axios.get(`http://localhost:3002/gettingvenuesbyratings`);
+        if(response===null){
+            const error=new Error('No revord find with this id');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json(response.data);
     }
     catch(error){
         if(!error.statusCode){

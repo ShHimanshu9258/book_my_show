@@ -1,7 +1,10 @@
 const User=require('../models/user');
 const Address=require('../models/address');
 const Event=require('../models/event');
+const dotenv=require('dotenv').config();
 
+// global variable decleration
+const RECORDS_PER_PAGE=`${process.env.RECORDS_PER_PAGE}`;
 
 
 const {GenerateSignature,ValidatePassword,GetDataByEmail, GetDataById}=require('../utility');
@@ -201,3 +204,25 @@ module.exports.GettingSeatAvailability=async(req,res,next)=>{
     }
 }
 
+module.exports.GetTopVenues=async(req,res,next)=>{
+    try{
+        const page=req.query.page || 1;
+        const totalRecords=await Event.find().countDocuments();
+        if(!totalRecords){
+            const error = new Error('No Venue exisits');
+            error.statusCode = 422;
+            throw error;
+        }
+        const venues=await Event.find()
+        .sort({ ratings: -1 })
+        .skip((page - 1) * RECORDS_PER_PAGE)
+        .limit(RECORDS_PER_PAGE);
+        return res.status(200).json(venues);
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+       }
+       next(error);
+    }
+}

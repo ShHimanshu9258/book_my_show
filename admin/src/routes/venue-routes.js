@@ -1,11 +1,21 @@
 const express=require('express');
 const router=express.Router();
 
-const {VenderSignIn, GetVenueAdminProfileById, UpdateEventTiming, CancelEvent, PostponeEvent, UpdateEventseats, GettingSeatAvailability}=require('../controller/venue-controller');
+const {
+    VenderSignIn, 
+    GetVenueAdminProfileById, 
+    UpdateEventTiming, 
+    CancelEvent, 
+    PostponeEvent, 
+    UpdateEventseats, 
+    GettingSeatAvailability,
+    GetTopVenues
+}=require('../controller/venue-controller');
 
 const isAuth=require('../middleware/is-auth');
 const isVenueAdmin=require('../middleware/is-venueAdmin');
 
+router.get('/gettingvenuesbyratings',GetTopVenues);
 // get vender profile by id
 router.get('/getvenderprofile-byid/:id',isAuth,isVenueAdmin,GetVenueAdminProfileById);
 

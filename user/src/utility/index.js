@@ -74,3 +74,4 @@ module.exports.RemoveDataById= async (id,Table)=>{
     }
 }
 
+
