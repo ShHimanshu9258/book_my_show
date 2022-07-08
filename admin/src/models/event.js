@@ -6,14 +6,13 @@ const eventSchema=new Schema({
         type:String,
         required:true
     },
-    imdbId:{
-        type:Number,
-        required:true,
-        unique:true
+    venueType:{
+        type:String,
+        required:true
     },
     seatAvailability:{
         type:mongoose.SchemaTypes.Boolean,
-        default:false,
+        default:true,
         required:true 
      },
      totalSeats:{
@@ -39,6 +38,21 @@ const eventSchema=new Schema({
          type:Number,
          required:true
      },
+     registrationId:{
+        type:Number,
+        required:true,
+        unique:true
+    },
+    venueLocation:[{
+        type: mongoose.SchemaTypes.ObjectId,
+        ref:'address',
+        required:true
+    }],
+    serviceAvailable:{
+        type:mongoose.SchemaTypes.Boolean,
+        default:false,
+        required:true
+    }
      
 },{
     toJSON:{

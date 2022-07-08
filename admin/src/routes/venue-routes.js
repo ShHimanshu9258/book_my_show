@@ -8,6 +8,7 @@ const isVenueAdmin=require('../middleware/is-venueAdmin');
 
 // get vender profile by id
 router.get('/getvenderprofile-byid/:id',isAuth,isVenueAdmin,GetVenueAdminProfileById);
+router.get('/getseatavailability/:id',);
 
 router.post('/venueadmin-login',VenderSignIn);
 

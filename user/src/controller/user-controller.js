@@ -1,6 +1,7 @@
 const User=require('../models/user');
 const Address=require('../models/address');
 const {GeneratePassword,GenerateSalt,GenerateSignature, GetDataByEmail, ValidatePassword, GetDataById}=require('../utility');
+const axios=require('axios');
 
 module.exports.GetUserProfileById=async(req,res,next)=>{
     try{
@@ -124,7 +125,9 @@ module.exports.UpdateAddress=async(req,res,next)=>{
 
 module.exports.GetSeatAvailability=async(req,res,next)=>{
     try{
-        
+        const id=req.params.id;
+        const response=await axios.get(`http://localhost:3002/`);
+
     }
     catch(error){
         if(!error.statusCode){
