@@ -147,7 +147,7 @@ module.exports.UpdateVenueLocation=async(req,res,next)=>{
 
 module.exports.AddVenueDetails=async(req,res,next)=>{
     try{
-        const {venueType,registrationId,event,timing,totalSeats,remaningAvailableSeats,ratings}=req.body;
+        const {venueType,registrationId,event,timing,totalSeats,remaningAvailableSeats,ratings,ticketPrice}=req.body;
         const existingVenue=await Event.findOne({registrationId:registrationId});
         if(existingVenue){
             const error=new Error('Venue is already registed with this registration number please try different one');
@@ -161,6 +161,7 @@ module.exports.AddVenueDetails=async(req,res,next)=>{
             timing:timing,
             totalSeats:totalSeats,
             remaningAvailableSeats:remaningAvailableSeats,
+            ticketPrice:ticketPrice,
             postponeEvent:[],
             venueLocation:[],
             ratings:ratings,

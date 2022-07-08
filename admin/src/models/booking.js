@@ -1,11 +1,10 @@
 const mongoose=require('mongoose');
 const Schema=mongoose.Schema;
-
-const bookingSchema=new Schema({
-    userId:{
+const BookingSchema=new Schema({
+    userId:[{
         type:mongoose.SchemaTypes.ObjectId,
         required:true
-    },
+    }],
     email:{
         type:String,
         required:true
@@ -18,20 +17,9 @@ const bookingSchema=new Schema({
         type:Object,
         required:true
     },
-    eventId:{
-        type:mongoose.SchemaType.ObjectId,
-        ref:'event',
+    eventId:[{
+        type:mongoose.SchemaTypes.ObjectId,
         required:true
-    }
-},{
-    toJSON:{
-        transform(doc,ret){
-            delete ret.__v;
-            delete ret.updatedAt;
-            delete ret.createdAt;
-        }
-    },
-    timestamps:true
+    }]
 });
-
-module.exports=mongoose.model('booking',bookingSchema);
+module.exports=mongoose.model('booking',BookingSchema);

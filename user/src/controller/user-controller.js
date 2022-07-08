@@ -211,3 +211,35 @@ module.exports.GettingVenues=async(req,res,next)=>{
     }
 }
 
+module.exports.TicketBooking=async (req,res,next)=>{
+    try{
+        const user=await GetDataById(req.user.id,User);
+        const venueId=req.params.id;
+        const {noOfTickets}=req.body;
+        if(!user){
+            const error=new Error('No User find with this id');
+            error.statusCode=422;
+            throw error;
+        }
+        const response=await axios.post(`http://localhost:3002/booking-seats/${venueId}`,{
+            user:user,
+            noOfTickets:noOfTickets
+        });
+        if(response===null){
+            const error=new Error('OOPS!! error occured Please try again');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json(response.data);
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+
+
+
+

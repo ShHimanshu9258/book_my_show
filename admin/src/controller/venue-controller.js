@@ -1,6 +1,7 @@
 const User=require('../models/user');
 const Address=require('../models/address');
 const Event=require('../models/event');
+const BookingModel=require('../models/booking');
 const dotenv=require('dotenv').config();
 
 // global variable decleration
@@ -224,5 +225,55 @@ module.exports.GetTopVenues=async(req,res,next)=>{
             error.statusCode=500;
        }
        next(error);
+    }
+}
+
+module.exports.BookingSeat=async (req,res,next)=>{
+    try{
+        const event=await GetDataById(req.params.id,Event);
+        const {user,noOfTickets}=req.body;
+        if(!event){
+            const error=new Error('No Event find with this id');
+            error.statusCode=422;
+            throw error;
+        }
+
+        if(event.remaningAvailableSeats >= noOfTickets){
+            const booking=new BookingModel({
+                userId:user._id,
+                email:user.email,
+                name:user.name,
+                address:user.address,
+                eventId:event
+            });
+            const bookingResult=await booking.save();
+            if(!bookingResult){
+                console.log('booking result failed');
+                const error=new Error('OOPS!! Seat no booked, Please try again');
+                error.statusCode=422;
+                throw error;
+            }
+            event.remaningAvailableSeats=event.remaningAvailableSeats-noOfTickets;
+            const eventResult=await event.save();
+            if(!eventResult){
+                console.log('event result failed');
+                const error=new Error('OOPS!! Error Occured event table not updated');
+                error.statusCode=422;
+                throw error;
+            }
+            return res.status(200).json({
+                message:'Congratulations your Ticket booking is confirmed...',
+                bookingId:bookingResult._id
+            });    
+        }
+        else{
+                return res.status(400).json({message:'OOPS no operation performed',remaningAvailableSeats:event.remaningAvailableSeats,requestData:noOfTickets});
+        }
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
     }
 }
