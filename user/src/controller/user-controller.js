@@ -126,7 +126,12 @@ module.exports.UpdateAddress=async(req,res,next)=>{
 module.exports.GetSeatAvailability=async(req,res,next)=>{
     try{
         const id=req.params.id;
-        const response=await axios.get(`http://localhost:3002/`);
+        const response=await axios.get(`http://localhost:3002/venue-seatavailable/${id}`);
+        if(response===null){
+            const error=new Error('No revord find with this id');
+        }
+        console.log(response.data);
+        return res.status(200).json(response.data);
 
     }
     catch(error){

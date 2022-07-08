@@ -4,7 +4,7 @@ const router=express.Router();
 const isAuth=require('../middleware/is-Auth');
 
 router.get('/get-user',isAuth,GetUserProfileById);
-router.get('/get-seats-availability',isAuth,GetSeatAvailability);
+router.get('/get-seats-availability/:id',isAuth,GetSeatAvailability);
 
 
 router.post('/create-user',CreteUser);

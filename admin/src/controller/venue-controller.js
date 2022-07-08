@@ -179,3 +179,25 @@ module.exports.UpdateEventseats=async(req,res,next)=>{
     }
 }
 
+module.exports.GettingSeatAvailability=async(req,res,next)=>{
+    try{
+        const event=await GetDataById(req.params.id,Event);
+        if(!event){
+            const error=new Error('No Data found with this id, Please try again');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json({
+            message:'Available seats',
+            seatAvailability:event.seatAvailability,
+            noOfseatsAvailable:event.remaningAvailableSeats
+        });
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+       }
+       next(error);
+    }
+}
+
