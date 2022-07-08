@@ -38,6 +38,10 @@ const eventSchema=new Schema({
          type:Number,
          required:true
      },
+     ticketPrice:{
+        type:Number,
+        required:true
+     },
      registrationId:{
         type:Number,
         required:true,
@@ -52,14 +56,25 @@ const eventSchema=new Schema({
         type:mongoose.SchemaTypes.Boolean,
         default:false,
         required:true
-    }
-     
+    },
+    bookingEvent:[{
+        type:mongoose.SchemaTypes.ObjectId,
+        default:'booking',
+        required:true
+    }],
+    cancelBooking:[{
+        type:mongoose.SchemaTypes.ObjectId,
+        default:'cancel_booking',
+        required:true
+    }]
 },{
     toJSON:{
         transform(doc,ret){
             delete ret.__v;
             delete ret.updatedAt;
             delete ret.createdAt;
+            delete ret.cancelBooking;
+            delete ret.bookingEvent;
         }
     },
     timestamps:true
