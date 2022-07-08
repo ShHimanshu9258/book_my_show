@@ -163,7 +163,9 @@ module.exports.AddVenueDetails=async(req,res,next)=>{
             remaningAvailableSeats:remaningAvailableSeats,
             postponeEvent:[],
             venueLocation:[],
-            ratings:ratings
+            ratings:ratings,
+            bookingEvent:[],
+            cancelBooking:[]
         });
         const result=await venue.save();
         if(!result){
