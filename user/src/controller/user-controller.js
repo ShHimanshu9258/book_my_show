@@ -2,6 +2,11 @@ const User=require('../models/user');
 const Address=require('../models/address');
 const {GeneratePassword,GenerateSalt,GenerateSignature, GetDataByEmail, ValidatePassword, GetDataById}=require('../utility');
 const axios=require('axios');
+const dotenv=require('dotenv').config();
+
+// global variable decleration
+const RECORDS_PER_PAGE=`${process.env.RECORDS_PER_PAGE}`;
+
 
 module.exports.GetUserProfileById=async(req,res,next)=>{
     try{
@@ -142,12 +147,17 @@ module.exports.GetSeatAvailability=async(req,res,next)=>{
 
 module.exports.GettingUsersData= async(req,res,next)=>{
     try{
-        const users=await User.find();
-        if(!users){
-            const error=new Error('No record found please try again');
-            error.statusCode=422;
+        const page=req.query.page || 1;
+        const totalRecords=await User.find().countDocuments();
+        if(!totalRecords){
+            const error = new Error('No Users exisits');
+            error.statusCode = 422;
             throw error;
         }
+        const users=await User.find()
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * RECORDS_PER_PAGE)
+        .limit(RECORDS_PER_PAGE);
         return res.status(200).json(users);
     }
     catch(error){
