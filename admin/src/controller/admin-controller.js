@@ -165,8 +165,6 @@ module.exports.AddVenueDetails=async(req,res,next)=>{
             postponeEvent:[],
             venueLocation:[],
             ratings:ratings,
-            bookingEvent:[],
-            cancelBooking:[]
         });
         const result=await venue.save();
         if(!result){

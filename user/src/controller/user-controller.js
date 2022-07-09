@@ -273,7 +273,7 @@ module.exports.CancelTicket=async(req,res,next)=>{
 module.exports.CheckingTicketBooking=async(req,res,next)=>{
     try{
         const ticketId=req.params.id;
-        console.log(req.signature);
+        
         const response=await axios.get(`http://localhost:3002/booking-details/${ticketId}`,{
             headers:{
                 Autherization:req.signature

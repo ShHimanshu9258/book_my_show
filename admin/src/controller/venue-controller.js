@@ -168,7 +168,9 @@ module.exports.UpdateEventseats=async(req,res,next)=>{
                 }
                 return res.status(200).json(result);
             }
-            return res.status(422).json({message:'No Such operation perform remaning seats is lower then modified seats , Please change seats'});
+            return res.status(422).json({
+                message:'No Such operation perform remaning seats is lower then modified seats , Please change seats'
+            });
         }
         else{
             const error=new Error('No such operation performed operation should be either increment or decrement');
@@ -244,7 +246,7 @@ module.exports.BookingSeat=async (req,res,next)=>{
                 email:user.email,
                 name:user.name,
                 address:user.address,
-                eventId:event,
+                eventId:event._id,
                 noOfTickets:noOfTickets
             });
             const bookingResult=await booking.save();
@@ -294,7 +296,7 @@ module.exports.CancelTicketBooking= async(req,res,next)=>{
             name:user.name,
             address:user.address,
             userId:user._id,
-            events:event,
+            events:event._id,
             noOfTickets:noOfTickets
         });
         const cancelBookingResult=await cancelBooking.save();
@@ -328,8 +330,9 @@ module.exports.CancelTicketBooking= async(req,res,next)=>{
 
 module.exports.FetchingTicketBookingDetails=async(req,res,next)=>{
     try{
-        const bookingDetails=await GetDataById(req.params.id,BookingModel);
-        if(!bookingDetails){
+        const bookingDetails=await BookingModel.findOne({_id:req.params.id});
+        const event=await GetDataById(bookingDetails.eventId[0],Event);
+        if(!bookingDetails && !event){
             const error=new Error('Booking details not fetched with this id..');
             error.statusCode=422;
             throw error;
@@ -338,7 +341,11 @@ module.exports.FetchingTicketBookingDetails=async(req,res,next)=>{
             message:'Fetching details successfull...',
             noOfTicketsBooked:bookingDetails.noOfTickets,
             name:bookingDetails.name,
-            email:bookingDetails.email
+            email:bookingDetails.email,
+            venueName:event.event,
+            venueType:event.venueType,
+            timing:event.timing,
+            ticketPrice:event.ticketPrice
         });
     }
     catch(error){

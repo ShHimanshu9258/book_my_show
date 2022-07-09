@@ -56,17 +56,7 @@ const eventSchema=new Schema({
         type:mongoose.SchemaTypes.Boolean,
         default:false,
         required:true
-    },
-    bookingEvent:[{
-        type:mongoose.SchemaTypes.ObjectId,
-        default:'booking',
-        required:true
-    }],
-    cancelBooking:[{
-        type:mongoose.SchemaTypes.ObjectId,
-        default:'cancel_booking',
-        required:true
-    }]
+    }
 },{
     toJSON:{
         transform(doc,ret){
