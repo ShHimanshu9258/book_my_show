@@ -294,4 +294,19 @@ module.exports.CheckingTicketBooking=async(req,res,next)=>{
     }
 }
 
+module.exports.SearchingByParameter=async(req,res,next)=>{
+    try{
+        const urlString=req.query;
+        console.log(urlString.split(':'));
+        return res.status(200).json(urlString);
+    }
+
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+
 

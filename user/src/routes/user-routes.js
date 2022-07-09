@@ -10,11 +10,12 @@ const {
     GettingVenues,
     TicketBooking,
     CancelTicket,
-    CheckingTicketBooking
+    CheckingTicketBooking,
+    SearchingByParameter
 }=require('../controller/user-controller');
 const router=express.Router();
 const isAuth=require('../middleware/is-Auth');
-
+router.get('/searching',isAuth,SearchingByParameter);
 router.get('/get-user',isAuth,GetUserProfileById);
 router.get('/get-userdata',GettingUsersData);
 router.get('/get-topvenues',isAuth,GettingVenues);
