@@ -10,7 +10,8 @@ const {
     UpdateEventseats, 
     GettingSeatAvailability,
     GetTopVenues,
-    BookingSeat
+    BookingSeat,
+    CancelTicketBooking
 }=require('../controller/venue-controller');
 
 const isAuth=require('../middleware/is-auth');
@@ -23,7 +24,7 @@ router.get('/getvenderprofile-byid/:id',isAuth,isVenueAdmin,GetVenueAdminProfile
 router.get('/venue-seatavailable/:id',GettingSeatAvailability);
 router.post('/venueadmin-login',VenderSignIn);
 router.post('/booking-seats/:id',BookingSeat);
-
+router.post('/cancel-ticketbooking/:id',CancelTicketBooking);
 router.patch('/updatevenuetiming/:id',isAuth,isVenueAdmin,UpdateEventTiming);
 router.patch('/cancel-event/:id',isAuth,isVenueAdmin,CancelEvent);
 

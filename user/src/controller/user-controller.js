@@ -240,6 +240,36 @@ module.exports.TicketBooking=async (req,res,next)=>{
     }
 }
 
+module.exports.CancelTicket=async(req,res,next)=>{
+    try{
+        const venueId=req.params.id;
+        const {noOfTickets,bookingId}=req.body;
+        const user=await GetDataById(req.user.id,User);
+        if(!user){
+            const error=new Error('No user find with this id');
+            error.statusCode=422;
+            throw error;
+        }
+        const response=await axios.post(`http://localhost:3002/cancel-ticketbooking/${venueId}`,{
+            user:user,
+            noOfTickets:noOfTickets,
+            bookingId:bookingId
+        });
+        if(response===null){
+            const error=new Error('OOPS!! error occured Please try again');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json(response.data);
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+
 
 
 

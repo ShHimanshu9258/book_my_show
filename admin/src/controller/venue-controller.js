@@ -2,13 +2,14 @@ const User=require('../models/user');
 const Address=require('../models/address');
 const Event=require('../models/event');
 const BookingModel=require('../models/booking');
+const CancelBooking=require('../models/cancelbooking');
 const dotenv=require('dotenv').config();
 
 // global variable decleration
 const RECORDS_PER_PAGE=`${process.env.RECORDS_PER_PAGE}`;
 
 
-const {GenerateSignature,ValidatePassword,GetDataByEmail, GetDataById}=require('../utility');
+const {GenerateSignature,ValidatePassword,GetDataByEmail, GetDataById, RemoveDataById}=require('../utility');
 
 module.exports.VenderSignIn=async(req,res,next)=>{
     try{
@@ -237,14 +238,14 @@ module.exports.BookingSeat=async (req,res,next)=>{
             error.statusCode=422;
             throw error;
         }
-
         if(event.remaningAvailableSeats >= noOfTickets){
             const booking=new BookingModel({
                 userId:user._id,
                 email:user.email,
                 name:user.name,
                 address:user.address,
-                eventId:event
+                eventId:event,
+                noOfTickets:noOfTickets
             });
             const bookingResult=await booking.save();
             if(!bookingResult){
@@ -256,6 +257,7 @@ module.exports.BookingSeat=async (req,res,next)=>{
             event.remaningAvailableSeats=event.remaningAvailableSeats-noOfTickets;
             const eventResult=await event.save();
             if(!eventResult){
+                await RemoveDataById(bookingResult._id,BookingModel);
                 console.log('event result failed');
                 const error=new Error('OOPS!! Error Occured event table not updated');
                 error.statusCode=422;
@@ -269,6 +271,52 @@ module.exports.BookingSeat=async (req,res,next)=>{
         else{
                 return res.status(400).json({message:'OOPS no operation performed',remaningAvailableSeats:event.remaningAvailableSeats,requestData:noOfTickets});
         }
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+
+module.exports.CancelTicketBooking= async(req,res,next)=>{
+    try{
+        const event=await GetDataById(req.params.id,Event);
+        const {noOfTickets,user,bookingId}=req.body;
+        if(!event){
+            const error=new Error('No Event find with this id');
+            error.statusCode=422;
+            throw error;
+        }
+        const cancelBooking=await CancelBooking({
+            email:user.email,
+            name:user.name,
+            address:user.address,
+            userId:user._id,
+            events:event,
+            noOfTickets:noOfTickets
+        });
+        const cancelBookingResult=await cancelBooking.save();
+        if(!cancelBookingResult){
+            const error=new Error('OOPS!! Error occured ticket not booked..');
+            error.statusCode=422;
+            throw error;
+        }
+        event.remaningAvailableSeats=event.remaningAvailableSeats+noOfTickets;
+        event.cancelBooking.push(cancelBookingResult);
+        const eventResult=await event.save();
+        await RemoveDataById(bookingId,BookingModel);
+        if(!eventResult){
+            await RemoveDataById(cancelBookingResult._id,CancelBooking);
+            const error=new Error("OOPS!! Error occured your ticket booking is not canceld");
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json({
+            message:'Congratulation your ticket canceld is confirmed',
+            noOfTicketCanceld:noOfTickets
+        });
     }
     catch(error){
         if(!error.statusCode){
