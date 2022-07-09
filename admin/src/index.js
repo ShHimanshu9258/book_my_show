@@ -33,6 +33,15 @@ app.use((error, req, res, next) => {
    });
   });
 
+  
+  // handling page not found and some url mismatch errors
+app.use((req,res,next)=>{
+    res.status(404).json({
+      message:'Invalid URl,Please check url once',
+      statusCode:404
+    });
+  });
+
  mongoose.connect(MONGODB_URI).then(()=>{
     app.listen(PORT,()=>{
         console.log('connected to db');
