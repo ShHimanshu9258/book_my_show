@@ -9,14 +9,16 @@ const {
     RemoveUserFromDatabase,
     GettingVenues,
     TicketBooking,
-    CancelTicket
+    CancelTicket,
+    CheckingTicketBooking
 }=require('../controller/user-controller');
 const router=express.Router();
 const isAuth=require('../middleware/is-Auth');
 
 router.get('/get-user',isAuth,GetUserProfileById);
 router.get('/get-userdata',GettingUsersData);
-router.get('/get-topvenues',isAuth,GettingVenues)
+router.get('/get-topvenues',isAuth,GettingVenues);
+router.get('/ticket-bookingdetails/:id',isAuth,CheckingTicketBooking);
 
 router.get('/get-seats-availability/:id',isAuth,GetSeatAvailability);
 

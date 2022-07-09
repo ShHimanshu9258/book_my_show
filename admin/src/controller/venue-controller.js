@@ -325,3 +325,26 @@ module.exports.CancelTicketBooking= async(req,res,next)=>{
         next(error);
     }
 }
+
+module.exports.FetchingTicketBookingDetails=async(req,res,next)=>{
+    try{
+        const bookingDetails=await GetDataById(req.params.id,BookingModel);
+        if(!bookingDetails){
+            const error=new Error('Booking details not fetched with this id..');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json({
+            message:'Fetching details successfull...',
+            noOfTicketsBooked:bookingDetails.noOfTickets,
+            name:bookingDetails.name,
+            email:bookingDetails.email
+        });
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}

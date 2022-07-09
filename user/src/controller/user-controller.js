@@ -270,6 +270,28 @@ module.exports.CancelTicket=async(req,res,next)=>{
     }
 }
 
-
+module.exports.CheckingTicketBooking=async(req,res,next)=>{
+    try{
+        const ticketId=req.params.id;
+        console.log(req.signature);
+        const response=await axios.get(`http://localhost:3002/booking-details/${ticketId}`,{
+            headers:{
+                Autherization:req.signature
+            }
+        });
+        if(!response){
+            const error=new Error('OOPS!! error occured No response get ');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json(response.data);
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
 
 
