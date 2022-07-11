@@ -296,8 +296,52 @@ module.exports.CheckingTicketBooking=async(req,res,next)=>{
 
 module.exports.SearchingByParameter=async(req,res,next)=>{
     try{
-        const urlString=req.query;
-        return res.status(200).json(urlString);
+          const searchingParameter=req.query.search;
+          if(searchingParameter===null ||searchingParameter===undefined){
+            const error =new Error('Searching parameters are empty');
+            error.statusCode=422;
+            throw error;
+          }
+          console.log(typeof searchingParameter);
+          const response=await axios.get(`http://localhost:3002/searchevent?search=${searchingParameter}`);
+          if(!response){
+            // console.log('inside response failed');
+            const error=new Error('OOPS!! error occured No response get ');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json(response.data);
+    }
+
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+
+module.exports.FindByPrice= async(req,res,next)=>{
+    try{
+          const price=req.query.price;
+          const page=req.query.page;
+
+          if(price===null ||price===undefined){
+            const error =new Error('Searching parameters are empty');
+            error.statusCode=422;
+            throw error;
+          }
+          const response=await axios.post(`http://localhost:3002/searcheventbyprice`,{
+            price:price,
+            page:page
+          });
+          if(!response){
+            // console.log('inside response failed');
+            const error=new Error('OOPS!! error occured No response get ');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json(response.data);
     }
 
     catch(error){

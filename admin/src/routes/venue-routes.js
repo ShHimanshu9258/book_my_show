@@ -12,18 +12,24 @@ const {
     GetTopVenues,
     BookingSeat,
     CancelTicketBooking,
-    FetchingTicketBookingDetails
+    FetchingTicketBookingDetails,
+    SearchingByParameter,
+    FindEventByPrice
 }=require('../controller/venue-controller');
 
 const isAuth=require('../middleware/is-auth');
 const isVenueAdmin=require('../middleware/is-venueAdmin');
 
 router.get('/gettingvenuesbyratings',GetTopVenues);
+router.get('/searchevent',SearchingByParameter);
+
 // get vender profile by id
 router.get('/getvenderprofile-byid/:id',isAuth,isVenueAdmin,GetVenueAdminProfileById);
 router.get('/booking-details/:id',FetchingTicketBookingDetails);
 router.get('/venue-seatavailable/:id',GettingSeatAvailability);
+
 router.post('/venueadmin-login',VenderSignIn);
+router.post('/searcheventbyprice',FindEventByPrice);
 router.post('/booking-seats/:id',BookingSeat);
 router.post('/cancel-ticketbooking/:id',CancelTicketBooking);
 router.patch('/updatevenuetiming/:id',isAuth,isVenueAdmin,UpdateEventTiming);

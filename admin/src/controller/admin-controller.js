@@ -1,6 +1,5 @@
 const User=require('../models/user');
 const Event=require('../models/event');
-const Address=require('../models/address');
 const {admin,superAdmin,venueAdmin}=require('../models/roles');
 const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole,GetDataByEmail, GetDataById, RemoveDataById} = require('../utility');
 const axios=require('axios');
@@ -104,50 +103,10 @@ module.exports.GetVenueAdmin=async(req,res,next)=>{
     }
 };
 
-module.exports.UpdateVenueLocation=async(req,res,next)=>{
-    try{
-        const id=req.params.id;
-        const {city,state,pincode,country,landmark}=req.body;
-        const event=await GetDataById(id,Event);
-        if(!event){
-            const error=new Error('No venue available with this id...');
-            error.statusCode=422;
-            throw error; 
-        }
-        const address=new Address({
-            city:city,
-            state:state,
-            country:country,
-            pincode:pincode,
-            landmark:landmark
-        });
-        const result=await address.save();
-        if(!result){
-            const error=new Error('No Location updtaed please try again');
-            error.statusCode=422;
-            throw error;
-        }
-        event.venueLocation.push(result);
-        const venueResult=await event.save();
-        if(!venueResult){
-            const error=new Error(' No Event updated ...');
-            error.statusCode=422;
-            throw error;
-        }
-        return res.status(201).json(venueResult);
-    }
-    catch(error){
-        if(!error.statusCode){
-            error.statusCode=500;
-        }
-        next(error);
-    }
-}
-
 
 module.exports.AddVenueDetails=async(req,res,next)=>{
     try{
-        const {venueType,registrationId,event,timing,totalSeats,remaningAvailableSeats,ratings,ticketPrice}=req.body;
+        const {venueType,registrationId,event,timing,totalSeats,remaningAvailableSeats,ratings,ticketPrice,address}=req.body;
         const existingVenue=await Event.findOne({registrationId:registrationId});
         if(existingVenue){
             const error=new Error('Venue is already registed with this registration number please try different one');
@@ -163,7 +122,7 @@ module.exports.AddVenueDetails=async(req,res,next)=>{
             remaningAvailableSeats:remaningAvailableSeats,
             ticketPrice:ticketPrice,
             postponeEvent:[],
-            venueLocation:[],
+            venueLocation:address,
             ratings:ratings,
         });
         const result=await venue.save();

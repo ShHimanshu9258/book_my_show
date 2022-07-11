@@ -47,11 +47,10 @@ const eventSchema=new Schema({
         required:true,
         unique:true
     },
-    venueLocation:[{
-        type: mongoose.SchemaTypes.ObjectId,
-        ref:'address',
+    venueLocation:{
+        type:Object,
         required:true
-    }],
+    },
     serviceAvailable:{
         type:mongoose.SchemaTypes.Boolean,
         default:false,
