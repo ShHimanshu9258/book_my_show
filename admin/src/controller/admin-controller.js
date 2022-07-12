@@ -63,7 +63,8 @@ module.exports.CreateAdmin=async (req,res,next)=>{
 module.exports.UserSignIn=async (req,res,next)=>{
     try{
         const {email,password}=req.body;
-        const user=await GetDataByEmail(email,User);
+        //const user=await GetDataByEmail(email,User);
+        const user=await User.findOne({email:email});
         if(!user){
             const error=new Error('User not find with this email');
             error.statusCode=422;
@@ -145,7 +146,8 @@ module.exports.AddVenueDetails=async(req,res,next)=>{
 module.exports.RemoveAdminById=async (req,res,next)=>{
     try{
         const id=req.params.id;
-        const result=await RemoveDataById(id,User);
+        //const result=await RemoveDataById(id,User);
+        const result=await User.findByIdAndRemove(id);
         if(!result){
             const error=new Error('No data removed');
             error.statusCode=422;
