@@ -2,6 +2,7 @@ const User=require('../models/user');
 const Address=require('../models/address');
 const {GeneratePassword,GenerateSalt,GenerateSignature, GetDataByEmail, ValidatePassword, GetDataById, RemoveDataById}=require('../utility');
 const axios=require('axios');
+const { findById } = require('../models/user');
 const dotenv=require('dotenv').config();
 
 // global variable decleration
@@ -10,7 +11,8 @@ const RECORDS_PER_PAGE=`${process.env.RECORDS_PER_PAGE}`;
 
 module.exports.GetUserProfileById=async(req,res,next)=>{
     try{
-        const user=await GetDataById(req.user.id,User)
+        //const user=await GetDataById(req.user.id,User)
+        const user=await User.findById(req.user.id);
         if(!user){
             const error=new Error('No user find inside db');
             error.statusCode=422;
@@ -29,7 +31,8 @@ module.exports.GetUserProfileById=async(req,res,next)=>{
 module.exports.CreteUser=async(req,res,next)=>{
     try{
          const {email,password,name,phone}= req.body;
-         const existingUser=await GetDataByEmail(email,User);
+         //const existingUser=await GetDataByEmail(email,User);
+         const existingUser=await User.findOne({email,email});
          if(existingUser){
             const error=new Error('user is already exist with this email');
             error.statusCode=422;
@@ -65,7 +68,8 @@ module.exports.CreteUser=async(req,res,next)=>{
 module.exports.UserSignIn= async(req,res,next)=>{
     try{
         const {email,password}=req.body;
-        const user=await GetDataByEmail(email,User);
+        //const user=await GetDataByEmail(email,User);
+        const user=await User.findOne({email:email});
         if(!user){
             const error=new Error('No data found with this email');
             error.statusCode=422;
@@ -91,7 +95,8 @@ module.exports.UserSignIn= async(req,res,next)=>{
 
 module.exports.UpdateAddress=async(req,res,next)=>{
     try{
-        const existingUser=await GetDataById(req.user.id,User);
+        //const existingUser=await GetDataById(req.user.id,User);
+        const existingUser=await User.findById(req.user.id);
         const {city,state,country,pincode,landmark}=req.body;
 
         if(!existingUser){
@@ -173,7 +178,8 @@ module.exports.GettingUsersData= async(req,res,next)=>{
 
 module.exports.RemoveUserFromDatabase=async(req,res,next)=>{
     try{
-        const result=await RemoveDataById(req.params.id,User);
+        //const result=await RemoveDataById(req.params.id,User);
+        const result=await User.findByIdAndRemove(id);
         if(!result){
             const error=new Error('No data find with this id,Use different one');
             error.statusCode=422;
@@ -214,7 +220,8 @@ module.exports.GettingVenues=async(req,res,next)=>{
 
 module.exports.TicketBooking=async (req,res,next)=>{
     try{
-        const user=await GetDataById(req.user.id,User);
+        // const user=await GetDataById(req.user.id,User);
+        const user=await User.findById(req.user.id);
         const venueId=req.params.id;
         const {noOfTickets}=req.body;
         if(!user){
@@ -245,7 +252,8 @@ module.exports.CancelTicket=async(req,res,next)=>{
     try{
         const venueId=req.params.id;
         const {noOfTickets,bookingId}=req.body;
-        const user=await GetDataById(req.user.id,User);
+        // const user=await GetDataById(req.user.id,User);
+        const user=await findById(req.user.id);
         if(!user){
             const error=new Error('No user find with this id');
             error.statusCode=422;
