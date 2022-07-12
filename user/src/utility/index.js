@@ -63,7 +63,7 @@ module.exports.GetDataByEmail= async(email,Table)=>{
 
 module.exports.RemoveDataById= async (id,Table)=>{
     try{
-        console.log(Table);
+        // console.log(Table);
         const result=await Table.findByIdAndRemove(id);
         if(result){
             return result;

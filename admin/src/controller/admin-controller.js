@@ -26,7 +26,8 @@ module.exports.GetAdmin=async (req,res,next)=>{
 module.exports.CreateAdmin=async (req,res,next)=>{
     try{
         const {email,password,address,name,phone}= req.body;
-        const existingUser=await GetDataByEmail(email,User);
+        //const existingUser=await GetDataByEmail(email,User);
+        const existingUser=await User.findOne({email:email});
         if(existingUser){
             const error=new Error('User is alerdy registerd');
             error.statusCode=422;
