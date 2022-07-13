@@ -84,13 +84,31 @@ In this application there are 3 modules which are as follow
 
 |   Role        | Request Type | Calling Controller Method |
 | --------------| ------------ | ------------------------- |
-|  VenueAdmin   | Get          | GetVenueAdminProfileById  |
+|               | Get          | GetVenueAdminProfileById  |
 |               |              | GetAllVenues              |
-|               | -------------|---------------------------|        
+| VenueAdmin    | -------------|---------------------------|        
 |               | Patch        | PostponeEvent             |
 |               |              | CancelEvent               | 
 |               |              | UpdateEventTiming         |
 |               |              | UpdateEventseat           |
+|-------------- |--------------|---------------------------|
+
+#### User
+|   Role        | Request Type | Calling Controller Method |
+| --------------| ------------ | ------------------------- |
+|               | Get          | FindByPrice               |
+|               |              | SearchingByParameter      |
+|   User        |              | GetUserProfileById        |        
+|               |              | GettingVenues             |
+|               |              | CheckingTicketBooking     | 
+|               |              | GetSeatAvailability       |
+|               | ------------ | ------------------------- |
+|               | Post         | CreteUser                 |
+|               |              | UserSignIn                |
+|               |------------- |-------------------------- |
+|               | Patch        | TicketBooking             |
+|               |              | CancelTicket              |
+|               |              | UpdateAddress             |
 |-------------- |--------------|---------------------------|
 
 
