@@ -1,5 +1,6 @@
 const express=require('express');
 const router=express.Router();
+const {body}=require('express-validator');
 
 const {
     VenderSignIn, 
@@ -28,7 +29,10 @@ router.get('/getvenderprofile-byid/:id',isAuth,isVenueAdmin,GetVenueAdminProfile
 router.get('/booking-details/:id',FetchingTicketBookingDetails);
 router.get('/venue-seatavailable/:id',GettingSeatAvailability);
 
-router.post('/venueadmin-login',VenderSignIn);
+router.post('/venueadmin-login',[
+    body('email').trim().isEmail().withMessage("Please enter a valid email"),
+    body('password').trim().isLength({min:6}).withMessage("Password length should be atlist 6 digit long")
+] ,VenderSignIn);
 router.post('/searcheventbyprice',FindEventByPrice);
 router.post('/booking-seats/:id',BookingSeat);
 router.post('/cancel-ticketbooking/:id',CancelTicketBooking);
