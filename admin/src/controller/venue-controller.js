@@ -13,7 +13,8 @@ const {GenerateSignature,ValidatePassword,GetDataByEmail, GetDataById, RemoveDat
 module.exports.VenderSignIn=async(req,res,next)=>{
     try{
         const {email,password}=req.body;
-        const user=await GetDataByEmail(email,User);
+        //const user=await GetDataByEmail(email,User);
+        const user=await User.findOne({email:email});
         if(!user){
             const error=new Error('No user exist with this email');
             error.statusCode=422;
@@ -39,7 +40,8 @@ module.exports.VenderSignIn=async(req,res,next)=>{
 module.exports.GetVenueAdminProfileById=async(req,res,next)=>{
     try{
         const id=req.params.id;
-        const result=await GetDataById(id,User);
+        //const result=await GetDataById(id,User);
+        const result=await User.findById(id);
         if(!result){
             const error=new Error('No Venue admin find with this id');
             error.statusCode=422;
@@ -59,7 +61,8 @@ module.exports.UpdateEventTiming=async(req,res,next)=>{
     try{
         const id=req.params.id;
         const {timing}=req.body;
-        const event=await GetDataById(id,Event);
+        // const event=await GetDataById(id,Event);
+        const event=await Event.findById(id);
         if(!event){
             const error=new Error('Event is not find with this id');
             error.statusCode=422;
@@ -85,7 +88,8 @@ module.exports.UpdateEventTiming=async(req,res,next)=>{
 module.exports.CancelEvent=async(req,res,next)=>{
     try{
         const id=req.params.id;
-        const event=await GetDataById(id,Event);
+        // const event=await GetDataById(id,Event);
+        const event=await Event.findById(id);
         if(!event){
             const error=new Error('Event is not find with this id');
             error.statusCode=422;
@@ -111,7 +115,8 @@ module.exports.CancelEvent=async(req,res,next)=>{
 module.exports.PostponeEvent=async(req,res,next)=>{
     try{
         const id=req.params.id;
-        const venue=await GetDataById(id,Event);
+        // const venue=await GetDataById(id,Event);
+        const venue=await Event.findById(id);
         if(!venue){
             const error=new Error('Event is not find with this id');
             error.statusCode=422;
@@ -138,7 +143,8 @@ module.exports.UpdateEventseats=async(req,res,next)=>{
     try{
         const id=req.params.id;
         const {modifiedSeats,operation}=req.body;
-        const event=await GetDataById(id,Event);
+        // const event=await GetDataById(id,Event);
+        const event=await Event.findById(id);
         if(!event){
             const error=new Error('Event is not find with this id..');
             error.statusCode=422;
@@ -187,7 +193,8 @@ module.exports.UpdateEventseats=async(req,res,next)=>{
 
 module.exports.GettingSeatAvailability=async(req,res,next)=>{
     try{
-        const event=await GetDataById(req.params.id,Event);
+        // const event=await GetDataById(req.params.id,Event);
+        const event=await Event.findById(req.params.id);
         if(!event){
             const error=new Error('No Data found with this id, Please try again');
             error.statusCode=422;
