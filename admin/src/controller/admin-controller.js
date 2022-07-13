@@ -1,5 +1,6 @@
 const User=require('../models/user');
 const Event=require('../models/event');
+const {validationResult}=require('express-validator');
 const {admin,superAdmin,venueAdmin}=require('../models/roles');
 const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole,GetDataByEmail, GetDataById, RemoveDataById} = require('../utility');
 const axios=require('axios');
@@ -25,6 +26,12 @@ module.exports.GetAdmin=async (req,res,next)=>{
 
 module.exports.CreateAdmin=async (req,res,next)=>{
     try{
+        const errors=validationResult(req);
+        if(!errors.isEmpty()){
+            const error=new Error(errors.array()[0].msg);
+            error.statusCode=422;
+           throw error;
+        }
         const {email,password,address,name,phone}= req.body;
         //const existingUser=await GetDataByEmail(email,User);
         const existingUser=await User.findOne({email:email});
@@ -62,6 +69,12 @@ module.exports.CreateAdmin=async (req,res,next)=>{
 
 module.exports.UserSignIn=async (req,res,next)=>{
     try{
+        const errors=validationResult(req);
+        if(!errors.isEmpty()){
+            const error=new Error(errors.array()[0].msg);
+            error.statusCode=422;
+           throw error;
+        }
         const {email,password}=req.body;
         //const user=await GetDataByEmail(email,User);
         const user=await User.findOne({email:email});
@@ -108,6 +121,12 @@ module.exports.GetVenueAdmin=async(req,res,next)=>{
 
 module.exports.AddVenueDetails=async(req,res,next)=>{
     try{
+        const errors=validationResult(req);
+        if(!errors.isEmpty()){
+            const error=new Error(errors.array()[0].msg);
+            error.statusCode=422;
+           throw error;
+        }
         const {venueType,registrationId,event,timing,totalSeats,remaningAvailableSeats,ratings,ticketPrice,address}=req.body;
         const existingVenue=await Event.findOne({registrationId:registrationId});
         if(existingVenue){

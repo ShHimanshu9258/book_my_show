@@ -73,13 +73,8 @@ module.exports.CreteUser=async(req,res,next)=>{
 
 module.exports.UserSignIn= async(req,res,next)=>{
     try{
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            const error = new Error(errors.array()[0].msg);
-            error.statusCode = 422;
-            throw error;
-        }
         const {email,password}=req.body;
+       
         //const user=await GetDataByEmail(email,User);
         const user=await User.findOne({email:email});
         if(!user){
