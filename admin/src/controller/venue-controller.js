@@ -3,6 +3,7 @@ const Event=require('../models/event');
 const BookingModel=require('../models/booking');
 const CancelBooking=require('../models/cancelbooking');
 const dotenv=require('dotenv').config();
+const {validationResult}=require('express-validator');
 
 // global variable decleration
 const RECORDS_PER_PAGE=`${process.env.RECORDS_PER_PAGE}`;
@@ -12,6 +13,12 @@ const {GenerateSignature,ValidatePassword,GetDataByEmail, GetDataById, RemoveDat
 
 module.exports.VenderSignIn=async(req,res,next)=>{
     try{
+        const errors=validationResult(req);
+        if(!errors.isEmpty()){
+            const error=new Error(errors.array()[0].msg);
+            error.statusCode=422;
+           throw error;
+        }
         const {email,password}=req.body;
         //const user=await GetDataByEmail(email,User);
         const user=await User.findOne({email:email});
