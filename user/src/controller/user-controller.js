@@ -2,7 +2,7 @@ const User=require('../models/user');
 const Address=require('../models/address');
 const {GeneratePassword,GenerateSalt,GenerateSignature, GetDataByEmail, ValidatePassword, GetDataById, RemoveDataById}=require('../utility');
 const axios=require('axios');
-const { findById } = require('../models/user');
+const {validationResult}=require('express-validator');
 const dotenv=require('dotenv').config();
 
 // global variable decleration
@@ -30,6 +30,12 @@ module.exports.GetUserProfileById=async(req,res,next)=>{
 
 module.exports.CreteUser=async(req,res,next)=>{
     try{
+        const errors=validationResult(req);
+        if(!errors.isEmpty()){
+            const error = new Error(errors.array()[0].msg);
+            error.statusCode = 422;
+            throw error;
+        }
          const {email,password,name,phone}= req.body;
          //const existingUser=await GetDataByEmail(email,User);
          const existingUser=await User.findOne({email,email});
@@ -67,6 +73,12 @@ module.exports.CreteUser=async(req,res,next)=>{
 
 module.exports.UserSignIn= async(req,res,next)=>{
     try{
+        const errors=validationResult(req);
+        if(!errors.isEmpty()){
+            const error = new Error(errors.array()[0].msg);
+            error.statusCode = 422;
+            throw error;
+        }
         const {email,password}=req.body;
         //const user=await GetDataByEmail(email,User);
         const user=await User.findOne({email:email});
@@ -95,6 +107,12 @@ module.exports.UserSignIn= async(req,res,next)=>{
 
 module.exports.UpdateAddress=async(req,res,next)=>{
     try{
+        const errors=validationResult(req);
+        if(!errors.isEmpty()){
+            const error = new Error(errors.array()[0].msg);
+            error.statusCode = 422;
+            throw error;
+        }
         //const existingUser=await GetDataById(req.user.id,User);
         const existingUser=await User.findById(req.user.id);
         const {city,state,country,pincode,landmark}=req.body;
