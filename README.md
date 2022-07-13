@@ -1,7 +1,7 @@
-![mongo](./user/images/mongo.png 'mongo') 
+![mongo](./images/mongo.png 'mongo') 
 <br/>
 
-![mongo](./user/images/microservice.jpeg 'mongo')
+![mongo](./images/microservice.jpeg 'mongo')
 <br/>
 <hr/>
 
