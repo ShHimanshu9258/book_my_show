@@ -65,19 +65,33 @@ In this application there are 3 modules which are as follow
 #### Admin
 
 |   Role        | Request Type | Calling Controller Method |
-|               |              |                           |
+| --------------| ------------ | ------------------------- |
 |  SuperAdmin   | Get          | GetAdmin                  |
 |               |              | GetAllRecords             |
-|               |              |                           |
+|               | -------------|---------------------------|
 |               |  Delete      | RemoveAdminById           |
-|               |              |                           |
+|---------------| ------------ |---------------------------|
 | Admin         | Get          | GettingUserFromUserPortal |
 |               |              | GetVenueAdmin             |
-|               |              |                           |
+|               | ------------ | --------------------------|
 |               | Post         | AddVenueDetails           |
-|               |              |                           |
+|               |--------------|---------------------------|
 |               | Delete       | RemoveVenueById           |
 |               |              | RemoveUserFromUserService |
+|------------------------------|---------------------------|
+
+#### VenueAdmin
+
+|   Role        | Request Type | Calling Controller Method |
+| --------------| ------------ | ------------------------- |
+|  VenueAdmin   | Get          | GetVenueAdminProfileById  |
+|               |              | GetAllVenues              |
+|               | -------------|---------------------------|        
+|               | Patch        | PostponeEvent             |
+|               |              | CancelEvent               | 
+|               |              | UpdateEventTiming         |
+|               |              | UpdateEventseat           |
+|-------------- |--------------|---------------------------|
 
 
 ## Tests <br/>
