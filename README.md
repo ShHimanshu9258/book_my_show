@@ -65,14 +65,20 @@ In this application there are 3 modules which are as follow
 #### Admin
 
 |   Role        | Request Type | Calling Controller Method |
+|               |              |                           |
 |  SuperAdmin   | Get          | GetAdmin                  |
 |               |              | GetAllRecords             |
+|               |              |                           |
 |               |  Delete      | RemoveAdminById           |
+|               |              |                           |
 | Admin         | Get          | GettingUserFromUserPortal |
-|               |              | GetVenueAdmin             |               
+|               |              | GetVenueAdmin             |
+|               |              |                           |
 |               | Post         | AddVenueDetails           |
+|               |              |                           |
 |               | Delete       | RemoveVenueById           |
 |               |              | RemoveUserFromUserService |
+
 
 ## Tests <br/>
 
