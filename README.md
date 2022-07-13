@@ -8,9 +8,9 @@
 ![lisence](https://img.shields.io/badge/mit-lisence-yellow 'lisence')<br/>
 
 ## _Requirements_ <br />
-[MONGODB](https://www.mongodb.com/cloud/atlas "mongodb") \. <br/>
-[NODEJS](https://nodejs.org "nodejs") \. <br/>
-[AXIOS](https://axios-http.com 'axios') \. <br/>
+[MONGODB](https://www.mongodb.com/cloud/atlas "mongodb")  <br/>
+[NODEJS](https://nodejs.org "nodejs")  <br/>
+[AXIOS](https://axios-http.com 'axios')  <br/>
 
 ### Build for local devlopments <br/>
 
@@ -25,10 +25,9 @@ if you are working on a fresh node application use the following command to setu
 <br/>
 
 ```
-npm install
+npm init
 ```
 <br/>
-See (`package.json`) for more details. <br/><br/>
 
 ## Build for staging and production environments
 <br/>
@@ -54,6 +53,32 @@ npm start
 <br/>
 
 See (`package.json`) for more details. <br/>
+
+## Modules
+
+In this application there are 3 modules which are as follow
+
+[Admin](https://github.com/ShHimanshu9258/book_my_show/blob/master/admin/src/routes/admin-routes.js 'admin') <br/>
+[VenueAdmin](https://github.com/ShHimanshu9258/book_my_show/blob/master/admin/src/routes/venue-routes.js 'venue')<br>
+[User](https://github.com/ShHimanshu9258/book_my_show/tree/master/user 'user')
+
+#### Admin
+
+|   Role        | Request Type | Calling Controller Method |
+| --------------| ------------ | ------------------------- |
+|  SuperAdmin   | Get          | GetAdmin                  |
+|               |              | GetAllRecords             |
+|               | -------------|---------------------------|
+|               |  Delete      | RemoveAdminById           |
+|---------------| ------------ |---------------------------|
+| Admin         | Get          | GettingUserFromUserPortal |
+|               |              | GetVenueAdmin             |
+|               | ------------ | --------------------------|
+|               | Post         | AddVenueDetails           |
+|               |--------------|---------------------------|
+|               | Delete       | RemoveVenueById           |
+|               |              | RemoveUserFromUserService |
+|------------------------------|---------------------------|
 
 ## Tests <br/>
 
