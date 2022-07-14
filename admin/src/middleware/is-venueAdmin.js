@@ -4,7 +4,13 @@ const {venueAdmin}=require('../models/roles');
 // importing reusable service from utility
 const {GetDataById}=require('../utility');
 
-
+/**
+ * checking login user is venueAdmin or not
+ * @param {req} req 
+ * @param {res} res 
+ * @param {next} next 
+ * @returns 
+ */
 module.exports=async (req,res,next)=>{
     try{
         const user=req.user;

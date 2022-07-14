@@ -1,6 +1,7 @@
 const express=require('express');
 const bodyParser=require('body-parser');
 const mongoose=require('mongoose');
+// importing detenv for getting enviroment variables
 const dotenv=require('dotenv').config();
 const app=express();
 

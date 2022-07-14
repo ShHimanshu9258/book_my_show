@@ -5,6 +5,14 @@ const {GetDataById}=require('../utility');
 // importing role from roles model
 const {admin}=require('../models/roles');
 // checking req.user is admin or not
+
+/**
+ * checking login user is admin or not
+ * @param {req} req 
+ * @param {res} res 
+ * @param {next} next 
+ * @returns 
+ */
 module.exports=async (req,res,next)=>{
     try{
         const user=req.user;

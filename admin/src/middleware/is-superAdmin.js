@@ -4,6 +4,13 @@ const {superAdmin}=require('../models/roles');
 // importing reusable function from utility
 const {GetDataById}=require('../utility');
 
+/**
+ * checking login user is superAdmin or not
+ * @param {req} req 
+ * @param {res} res 
+ * @param {next} next 
+ * @returns 
+ */
 module.exports=async (req,res,next)=>{
     try{
         const user=req.user;

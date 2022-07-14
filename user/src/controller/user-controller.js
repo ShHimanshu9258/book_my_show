@@ -1,18 +1,31 @@
+// importing models from model folder
 const User=require('../models/user');
 const Address=require('../models/address');
+// importing reusable function from utility
 const {GeneratePassword,GenerateSalt,GenerateSignature, GetDataByEmail, ValidatePassword, GetDataById, RemoveDataById}=require('../utility');
+// importing axios for cross api call
 const axios=require('axios');
+// importing express-validator for validation purpose
 const {validationResult}=require('express-validator');
+// importing dotenv for getting enviroment variables
 const dotenv=require('dotenv').config();
 
 // global variable decleration
 const RECORDS_PER_PAGE=`${process.env.RECORDS_PER_PAGE}`;
 
-
+/**
+ * 
+ * @param {req} req 
+ * @param {res} res 
+ * @param {next} next 
+ * @returns 
+ */
 module.exports.GetUserProfileById=async(req,res,next)=>{
     try{
         //const user=await GetDataById(req.user.id,User)
+        // fetching user details by id
         const user=await User.findById(req.user.id);
+        // throws error if user is not find
         if(!user){
             const error=new Error('No user find inside db');
             error.statusCode=422;
@@ -20,6 +33,7 @@ module.exports.GetUserProfileById=async(req,res,next)=>{
         }
         return res.status(200).json(user);
     }
+    // error handling it will call index.js global error handling method
     catch(error){
         if(!error.statusCode){
             error.statusCode=500;
@@ -28,23 +42,29 @@ module.exports.GetUserProfileById=async(req,res,next)=>{
     }
 }
 
+// creating customer
 module.exports.CreteUser=async(req,res,next)=>{
     try{
+        // checking validation 
         const errors=validationResult(req);
         if(!errors.isEmpty()){
             const error = new Error(errors.array()[0].msg);
             error.statusCode = 422;
             throw error;
         }
+        // requested parameters
          const {email,password,name,phone}= req.body;
          //const existingUser=await GetDataByEmail(email,User);
+         // fetching user data by email if exist throws error
          const existingUser=await User.findOne({email,email});
          if(existingUser){
             const error=new Error('user is already exist with this email');
             error.statusCode=422;
             throw error;
          }
+         // generating salt
          const salt=await GenerateSalt();
+         // generating password it will take 2 parameters 1.password 2.salt 
          const userPassword=await GeneratePassword(password,salt);
          const user=new User({
             email:email,
@@ -55,11 +75,13 @@ module.exports.CreteUser=async(req,res,next)=>{
             salt:salt
         });
         const result=await user.save();
+        // throws error if db operation failed
         if(!result){
             const error=new Error('No user added inside database');
             error.statusCode=422;
             throw error;
          }
+         // generating signature by parameters
              const token = await GenerateSignature({ email: result.email, id: result._id});
              return res.status(201).json({id: result._id, token });
     }
@@ -71,23 +93,28 @@ module.exports.CreteUser=async(req,res,next)=>{
     }
 }
 
+// userLogin 
 module.exports.UserSignIn= async(req,res,next)=>{
     try{
+        // requested Parameter
         const {email,password}=req.body;
        
         //const user=await GetDataByEmail(email,User);
+        // fetching record by email if user not found throws error
         const user=await User.findOne({email:email});
         if(!user){
             const error=new Error('No data found with this email');
             error.statusCode=422;
             throw error;
         }
+        // validating userPassword it will take 3 paramterrs 1.userPassword 2.savedPassword 3.savedSalt
         const validPassword=await ValidatePassword(password,user.password,user.salt);
         if(!validPassword){
             const error=new Error('User password is not match');
             error.statusCode=422;
             throw error;
         }
+        // generating signature
         const token = await GenerateSignature({ email: user.email, id: user._id});
         return res.status(201).json({id: user._id, token });
     }
@@ -99,9 +126,10 @@ module.exports.UserSignIn= async(req,res,next)=>{
         next(error);
     }
 }
-
+// updating user address
 module.exports.UpdateAddress=async(req,res,next)=>{
     try{
+        // throws error if validation failed
         const errors=validationResult(req);
         if(!errors.isEmpty()){
             const error = new Error(errors.array()[0].msg);
@@ -109,7 +137,9 @@ module.exports.UpdateAddress=async(req,res,next)=>{
             throw error;
         }
         //const existingUser=await GetDataById(req.user.id,User);
+        // fettching userdetails by id
         const existingUser=await User.findById(req.user.id);
+        // requesting parameters
         const {city,state,country,pincode,landmark}=req.body;
 
         if(!existingUser){
@@ -125,6 +155,7 @@ module.exports.UpdateAddress=async(req,res,next)=>{
             state:state
         });
         const addressResult=await address.save();
+        // throws error if db operation failed
         if(!addressResult){
             const error=new Error('OOPS!! Error occured no data inserted into db');
             error.statusCode=422;
@@ -147,10 +178,13 @@ module.exports.UpdateAddress=async(req,res,next)=>{
     }
 };
 
+// conforming seats availability from venueAdmin service
 module.exports.GetSeatAvailability=async(req,res,next)=>{
     try{
         const id=req.params.id;
+        // cross api call
         const response=await axios.get(`http://localhost:3002/venue-seatavailable/${id}`);
+        // throws error if response is null
         if(response===null){
             const error=new Error('No revord find with this id');
             error.statusCode=422;
@@ -166,15 +200,18 @@ module.exports.GetSeatAvailability=async(req,res,next)=>{
     }
 }
 
+// getting user data
 module.exports.GettingUsersData= async(req,res,next)=>{
     try{
         const page=req.query.page || 1;
+        // count totalrecords
         const totalRecords=await User.find().countDocuments();
         if(!totalRecords){
             const error = new Error('No Users exisits');
             error.statusCode = 422;
             throw error;
         }
+        // find records
         const users=await User.find()
         .sort({ createdAt: -1 })
         .skip((page - 1) * RECORDS_PER_PAGE)
@@ -188,10 +225,11 @@ module.exports.GettingUsersData= async(req,res,next)=>{
         next(error);
     }
 }
-
+// removing user by admin service
 module.exports.RemoveUserFromDatabase=async(req,res,next)=>{
     try{
         //const result=await RemoveDataById(req.params.id,User);
+        // fetching user by id and remove if no match found throws error
         const result=await User.findByIdAndRemove(id);
         if(!result){
             const error=new Error('No data find with this id,Use different one');
@@ -211,10 +249,10 @@ module.exports.RemoveUserFromDatabase=async(req,res,next)=>{
         next(error);
     }
 }
-
+// finding top venues
 module.exports.GettingVenues=async(req,res,next)=>{
     try{
-        console.log('inside getting user');
+        // crossapi checking if response is null then throws error
         const response=await axios.get(`http://localhost:3002/gettingvenuesbyratings`);
         if(response===null){
             const error=new Error('No revord find with this id');
@@ -230,18 +268,22 @@ module.exports.GettingVenues=async(req,res,next)=>{
         next(error);
     }
 }
-
+// ticket booking by user and call venue service call
 module.exports.TicketBooking=async (req,res,next)=>{
     try{
         // const user=await GetDataById(req.user.id,User);
+        // fetching existing user by id
         const user=await User.findById(req.user.id);
+        // requesting parameters
         const venueId=req.params.id;
         const {noOfTickets}=req.body;
+        // throws error if operation failed
         if(!user){
             const error=new Error('No User find with this id');
             error.statusCode=422;
             throw error;
         }
+        // cross api call and sending data throws error if response is null
         const response=await axios.post(`http://localhost:3002/booking-seats/${venueId}`,{
             user:user,
             noOfTickets:noOfTickets
@@ -260,18 +302,21 @@ module.exports.TicketBooking=async (req,res,next)=>{
         next(error);
     }
 }
-
+// ticket booking by user and call venue service call
 module.exports.CancelTicket=async(req,res,next)=>{
     try{
+        // requesting parameters
         const venueId=req.params.id;
         const {noOfTickets,bookingId}=req.body;
         // const user=await GetDataById(req.user.id,User);
+        // fetching data by id throws error if no data found
         const user=await findById(req.user.id);
         if(!user){
             const error=new Error('No user find with this id');
             error.statusCode=422;
             throw error;
         }
+        // cross api call and sending parameters throws error if response is null
         const response=await axios.post(`http://localhost:3002/cancel-ticketbooking/${venueId}`,{
             user:user,
             noOfTickets:noOfTickets,
@@ -292,10 +337,12 @@ module.exports.CancelTicket=async(req,res,next)=>{
     }
 }
 
+// checking ticket booking by id
 module.exports.CheckingTicketBooking=async(req,res,next)=>{
     try{
+        // requesting parameters
         const ticketId=req.params.id;
-        
+        // cross api call throws error if response is null
         const response=await axios.get(`http://localhost:3002/booking-details/${ticketId}`,{
             headers:{
                 Autherization:req.signature
@@ -315,16 +362,18 @@ module.exports.CheckingTicketBooking=async(req,res,next)=>{
         next(error);
     }
 }
-
+// searching value by paramters
 module.exports.SearchingByParameter=async(req,res,next)=>{
     try{
+        // requesting parameters
           const searchingParameter=req.query.search;
+          // if requesting parameters is null or undefined throws error
           if(searchingParameter===null ||searchingParameter===undefined){
             const error =new Error('Searching parameters are empty');
             error.statusCode=422;
             throw error;
           }
-          console.log(typeof searchingParameter);
+          // cross api call
           const response=await axios.get(`http://localhost:3002/searchevent?search=${searchingParameter}`);
           if(!response){
             // console.log('inside response failed');
@@ -342,7 +391,7 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
         next(error);
     }
 }
-
+// finding event according by price
 module.exports.FindByPrice= async(req,res,next)=>{
     try{
           const price=req.query.price;
