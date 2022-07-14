@@ -1,28 +1,42 @@
+// basic testing packages 
 const expect=require('chai').expect;
 const sinon=require('sinon');
+// importing utility folder
 const utility=require('../utility');
+// importing models
 const User=require('../models/user');
 const Event=require('../models/event');
+// importing admin controller for calling adminController methods
 const adminController=require('../controller/admin-controller');
+// importing axios 
 const axios=require('axios').default;
 
 
+
 describe('Admin-Controller Testing',function(){
+    // testing adminController method getDataByAdmin
     describe('Get Admin By Role',function(){
         it('Should throws an error 500 if db operation failed',function(){
+            // this function is used for calling methods
+            // it will take 2 parameters 1 .functionClass and 2. Methods or function name
             sinon.stub(utility,'GetDataAccordingRole');
+            // throws error for particular method
             utility.GetDataAccordingRole.throws();
+            // requesting method vaue
             const req={
                 get:function(role){
                     return null;
                 }
             }
+            // calling adminController method
             adminController.GetAdmin(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',500);
             });
+            // restoring the value
             utility.GetDataAccordingRole.restore();
         })
+        // if error is 422 means if data not found
         it('Should throws an error 422 if No data found',function(){
             sinon.stub(utility,'GetDataAccordingRole');
             utility.GetDataAccordingRole.throws();
@@ -39,6 +53,7 @@ describe('Admin-Controller Testing',function(){
         })
     })
     describe('GetVenueAdmins-role',function(){
+        // if db operation failed
         it('Should throws an error 500 if db operation failed',function(){
             sinon.stub(utility,'GetDataAccordingRole');
             utility.GetDataAccordingRole.throws();
@@ -47,12 +62,14 @@ describe('Admin-Controller Testing',function(){
                     return null;
                 }
             }
+            // calling controller method
             adminController.GetVenueAdmin(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',500);
             });
             utility.GetDataAccordingRole.restore();
         })
+        // if data not found
         it('Should throws an error 422 if No data found',function(){
             sinon.stub(utility,'GetDataAccordingRole');
             utility.GetDataAccordingRole.throws();
@@ -69,6 +86,7 @@ describe('Admin-Controller Testing',function(){
         })
     })
     describe('Create user',function(){
+         // if db operation failed
         it('it should through an error if user is already exist ',function(){
             sinon.stub(User,'findOne');
             User.findOne.throws();
@@ -77,12 +95,14 @@ describe('Admin-Controller Testing',function(){
                     email:'test@test.com'
                 }
             }
+            // calling controller method
             adminController.CreateAdmin(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
             })
             User.findOne.restore();
         })
+         // ifsalt is not generated
         it('it should through an error if generating salt failed',function(){
             sinon.stub(utility,'GenerateSalt');
             utility.GenerateSalt.throws();
@@ -91,6 +111,7 @@ describe('Admin-Controller Testing',function(){
                     salt:'somesalt'
                 }
             }
+            // calling controller method
             adminController.CreateAdmin(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
@@ -105,6 +126,7 @@ describe('Admin-Controller Testing',function(){
                     password:'test123'
                 }
             }
+            // calling controller method
             adminController.CreateAdmin(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
@@ -112,6 +134,7 @@ describe('Admin-Controller Testing',function(){
             utility.GeneratePassword.restore();
         });
         it('it should throw an error 500 if db operation failed',function(){
+            // if db operation failed
             sinon.stub(User,'create');
             User.create.throws();
             const req={
@@ -124,6 +147,7 @@ describe('Admin-Controller Testing',function(){
                     salt:'test123'
                 }
             }
+            // calling controller method
             adminController.CreateAdmin(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
@@ -132,6 +156,7 @@ describe('Admin-Controller Testing',function(){
         })
     })
     describe('Admin controller Signin',function(){
+        // if db operation failed
         it('Should throw an error with code 500 if accessing the database fails',function(){
             sinon.stub(User,'findOne');
             User.findOne.throws();
@@ -142,6 +167,7 @@ describe('Admin-Controller Testing',function(){
                     password:'tester'
                 }
             };
+            // calling controller method
             adminController.UserSignIn(req,{},()=>{}).then(result=>{
                 // console.log(result);
                 expect(result).to.be.an('error');
@@ -158,6 +184,7 @@ describe('Admin-Controller Testing',function(){
                     password:'tester',
                 }
             };
+            // calling controller method
             adminController.UserSignIn(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
@@ -166,6 +193,7 @@ describe('Admin-Controller Testing',function(){
         })
     });
     describe('Add Venue',function(){
+        // if db operation failed
         it('Should throws an error 500 if db operation fails',function(){
             sinon.stub(Event,'findOne');
             Event.findOne.throws();
@@ -175,6 +203,7 @@ describe('Admin-Controller Testing',function(){
                     userId:'123445343nd'
                 }
             }
+            // calling controller method
             adminController.AddVenueDetails(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',500);
@@ -198,6 +227,7 @@ describe('Admin-Controller Testing',function(){
                     ratings:'ratings',
                 }
             }
+            // calling controller method
             adminController.AddVenueDetails(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',500);
@@ -206,6 +236,7 @@ describe('Admin-Controller Testing',function(){
         })
     })
     describe('Remove Admin by superAdmin',function(){
+        // if db operation failed
         it('Should throws an error 500 if db operation failed',function(){
             sinon.stub(User,'findByIdAndRemove');
             User.findByIdAndRemove.throws();
@@ -214,6 +245,7 @@ describe('Admin-Controller Testing',function(){
                     userId:'12enbshdbsjwnswbwkbwkdw'
                 }
             }
+            // calling controller method
             adminController.RemoveAdminById(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',500);
@@ -229,6 +261,7 @@ describe('Admin-Controller Testing',function(){
                     userId:'12enbshdbsjwnswbwkbwkdw'
                 }
             }
+            // calling controller method
             adminController.RemoveAdminById(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
@@ -238,6 +271,7 @@ describe('Admin-Controller Testing',function(){
         })
     })
     describe('Remove venueAdmin by admin',function(){
+        // if db operation failed
         it('Should throws an error 500 if db operation failed',function(){
             sinon.stub(User,'findByIdAndRemove');
             User.findByIdAndRemove.throws();
@@ -246,6 +280,7 @@ describe('Admin-Controller Testing',function(){
                     userId:'12enbshdbsjwnswbwkbwkdw'
                 }
             }
+            // calling controller method
             adminController.RemoveVenueById(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',500);
@@ -261,6 +296,7 @@ describe('Admin-Controller Testing',function(){
                     userId:'12enbshdbsjwnswbwkbwkdw'
                 }
             }
+            // calling controller method
             adminController.RemoveVenueById(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
@@ -270,7 +306,7 @@ describe('Admin-Controller Testing',function(){
         })
     })
     describe('GettingUserFromUserPortal',function(){
-        it('Should Throw an error 422 if response is null ',function(){
+        it('Should Throw an error 422 if response is null ',function(done){
             sinon.stub(axios,'get');
             axios.get.throws();
 
@@ -279,12 +315,15 @@ describe('Admin-Controller Testing',function(){
                     
                 }
             }
+            // calling controller method
             adminController.GettingUserFromUserPortal(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
+                done();
             });
+            done();
             axios.get.restore();
-        })
+        }) // if db operation failed
         it('should throw an error 500 if operation failed',function(){
             sinon.stub(axios,'get');
             axios.get.throws();
@@ -293,6 +332,7 @@ describe('Admin-Controller Testing',function(){
                     
                 }
             }
+            // calling controller method
             adminController.GettingUserFromUserPortal(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
@@ -310,12 +350,14 @@ describe('Admin-Controller Testing',function(){
                     
                 }
             }
+            // calling controller method
             adminController.RemoveUserFromUserService(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
             });
             axios.delete.restore();
         })
+        // if db operation failed
         it('should throw an error 500 if operation failed',function(){
             sinon.stub(axios,'delete');
             axios.delete.throws();
@@ -324,6 +366,7 @@ describe('Admin-Controller Testing',function(){
                     
                 }
             }
+            // calling controller method
             adminController.RemoveUserFromUserService(req,{},()=>{}).then(result=>{
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',500);

@@ -1,14 +1,19 @@
+// importing models from modelFolder
 const User=require('../models/user');
-const {GetDataById}=require('../utility');
 const {venueAdmin}=require('../models/roles');
+// importing reusable service from utility
+const {GetDataById}=require('../utility');
+
 
 module.exports=async (req,res,next)=>{
     try{
         const user=req.user;
         if(user){
+            // fetching details from id
             const userResult=await GetDataById(user.id,User);
             if(userResult){
                 console.log(userResult.roles);
+                // checking user is venueAdmin or not
                 if(userResult.roles===venueAdmin){
                     return next();
                 }

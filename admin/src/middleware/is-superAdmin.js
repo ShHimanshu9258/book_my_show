@@ -1,13 +1,18 @@
+// importing models from model folder
 const User=require('../models/user');
-const {GetDataById}=require('../utility');
 const {superAdmin}=require('../models/roles');
+// importing reusable function from utility
+const {GetDataById}=require('../utility');
+
 module.exports=async (req,res,next)=>{
     try{
         const user=req.user;
         if(user){
+            // fetching data by id
             const userResult=await GetDataById(user.id,User);
             if(userResult){
                 console.log(userResult.roles);
+                // checking req.user is superAdmin or not
                 if(userResult.roles===superAdmin){
                     return next();
                 }
