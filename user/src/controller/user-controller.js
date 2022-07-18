@@ -107,7 +107,7 @@ module.exports.VerifyUser=async(req,res,next)=>{
             throw error;
         }
         const profile=await GetDataById(user.id,User);
-        if(profile.otp===parseInt(otp) && profile.otp_expiry> new Date()){
+        if(profile.otp===parseInt(otp) ){
             profile.verified= !profile.verified;
             const result=await profile.save();
             if(!result){
@@ -126,6 +126,11 @@ module.exports.VerifyUser=async(req,res,next)=>{
                 verified:result.verified,
                 email:result.email
             });
+        }
+        else{
+            const error=new Error('OOPS!! OTP not matched please enter valid otp, or request for new otp generation');
+            error.statusCode=422;
+            throw error;
         }
     }
     catch(error){
@@ -286,6 +291,7 @@ module.exports.GetSeatAvailability=async(req,res,next)=>{
 module.exports.GettingUsersData= async(req,res,next)=>{
     try{
         const page=req.query.page || 1;
+        console.log(req.query.page);
         // count totalrecords
         const totalRecords=await User.find().countDocuments();
         if(!totalRecords){
@@ -334,8 +340,9 @@ module.exports.RemoveUserFromDatabase=async(req,res,next)=>{
 // finding top venues
 module.exports.GettingVenues=async(req,res,next)=>{
     try{
+        const page=req.query.page || 1;
         // crossapi checking if response is null then throws error
-        const response=await axios.get(`http://localhost:3002/gettingvenuesbyratings`);
+        const response=await axios.get(`http://localhost:3002/gettingvenuesbyratings?page=${page}`);
         if(response===null){
             const error=new Error('No revord find with this id');
             error.statusCode=422;
@@ -447,6 +454,7 @@ module.exports.CheckingTicketBooking=async(req,res,next)=>{
 // searching value by paramters
 module.exports.SearchingByParameter=async(req,res,next)=>{
     try{
+        const page=req.query.page || 1;
         // requesting parameters
           const searchingParameter=req.query.search;
           // if requesting parameters is null or undefined throws error
@@ -456,7 +464,7 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
             throw error;
           }
           // cross api call
-          const response=await axios.get(`http://localhost:3002/searchevent?search=${searchingParameter}`);
+          const response=await axios.get(`http://localhost:3002/searchevent?search=${searchingParameter} & page=${page}`);
           if(!response){
             // console.log('inside response failed');
             const error=new Error('OOPS!! error occured No response get ');
@@ -477,7 +485,7 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
 module.exports.FindByPrice= async(req,res,next)=>{
     try{
           const price=req.query.price;
-          const page=req.query.page;
+          const page=req.query.page ||1;
 
           if(price===null ||price===undefined){
             const error =new Error('Searching parameters are empty');

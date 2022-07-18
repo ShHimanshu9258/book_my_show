@@ -7,12 +7,16 @@ const {admin,superAdmin,venueAdmin}=require('../models/roles');
 const {validationResult}=require('express-validator');
 
 // importing reusable function from utility/index.js
-const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataAccordingRole,GetDataByEmail, GetDataById, RemoveDataById} = require('../utility');
+const { GenerateSalt, GeneratePassword ,ValidatePassword,GenerateSignature,GetDataByEmail, GetDataById, RemoveDataById} = require('../utility');
 
 // importing axios for cross-api data call
 const axios=require('axios');
 
+// importing dotenv for enviromental variables
+const dotenv=require('dotenv').config;
 
+// global variables dec
+const RECORDS_PER_PAGE=`${process.env.RECORDS_PER_PAGE}`;
 /**
  * switch role of a venueAdmin to admin and vice-versa by super admin
  * @param {req} req
@@ -23,8 +27,12 @@ const axios=require('axios');
 // getting admin by superAdmin
 module.exports.GetAdmin=async (req,res,next)=>{
     try{
+        const page=req.query.page ||1;
         // reusable function which will return data according role
-        const adminResult=await GetDataAccordingRole('admin');
+        const adminResult=await User.find({roles:admin})
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * RECORDS_PER_PAGE)
+        .limit(RECORDS_PER_PAGE);
         // it will through an error if no record found
         if(!adminResult){
             const error=new Error('No Data found');
@@ -75,7 +83,7 @@ module.exports.CreateAdmin=async (req,res,next)=>{
                 name:name,
                 password:userPassword,
                 salt:salt,
-                roles:venueAdmin
+                roles:superAdmin            
             });
             const result=await user.save();
             // throws error if db operation failed
@@ -136,8 +144,12 @@ module.exports.UserSignIn=async (req,res,next)=>{
 // getting venueAdmin by admin and superAdmin
 module.exports.GetVenueAdmin=async(req,res,next)=>{
     try{
+        const page=req.body.page || 1;
         // reusable function fetching data according to role
-        const venueResult=await GetDataAccordingRole('venueadmin'); 
+        const venueResult=await User.find({roles:venueAdmin})
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * RECORDS_PER_PAGE)
+        .limit(RECORDS_PER_PAGE); 
         if(!venueResult){
             const error=new Error('No venueAdmin find');
             error.statusCode=422;
@@ -187,7 +199,7 @@ module.exports.AddVenueDetails=async(req,res,next)=>{
         });
         const result=await venue.save();
         if(!result){
-            const error=new Error('Event not cretaed please try again');
+            const error=new Error('Event not created please try again');
             error.statusCode=422;
             throw error;
         }
@@ -245,7 +257,9 @@ module.exports.RemoveVenueById=async(req,res,next)=>{
 module.exports.GettingUserFromUserPortal= async(req,res,next)=>{
     try{
         // it will fetching data from user service
-        const response=await axios.get(`http://localhost:4002/get-userdata`);
+        const page=req.query.page || 1;
+        
+        const response=await axios.get(`http://localhost:4002/get-userdata?page=${page}`);
         // throws error if no users founds
         if(response===null){
             const error=new Error('No record found please try again');

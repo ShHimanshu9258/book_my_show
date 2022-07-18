@@ -436,9 +436,9 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
         // fetching details
         const result=await Event.find({
             '$or':[
-                { event: { '$regex': filters, $options: 'i' } },
-                { venueType: { '$regex': filters, $options: 'i' } },
-                {venueLocation:{'$regex':filters, $options:'i'}},
+                { event: { '$regex': filters, $options: "i" } },
+                { venueType: { '$regex': filters, $options: "i" } },
+                {venueLocation:{'$regex':filters, $options:"i"}},
             ]
         });
         if(!result){
@@ -456,62 +456,86 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
         next(error);
     }
 }
-// fetching data by price
+
 module.exports.FindEventByPrice=async(req,res,next)=>{
     try{
-        // requested parameters
-        let {price}=req.body;
-        let page = req.body.page||1;
-        // fetchings events
-        const result=await Event.find();
-        // throws error if record failed
+        const page=req.query.page || 1;
+        const {price}=req.body;
+        const result=await Event.find({ticketPrice:{$lte:price}})
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * RECORDS_PER_PAGE)
+        .limit(RECORDS_PER_PAGE);
         if(!result){
-            const error=new Error('No Data found...');
+            const error=new Error('OOPS!! No data found');
             error.statusCode=422;
             throw error;
         }
-         let resultArray=[];
-         // storing data in resultArray if records are lower then requested price
-         resultArray=result.filter(event=>{
-            if(event.ticketPrice<=price){
-               return resultArray.push(event);
-            }
-        });
-        // throws error if records are not find
-        if(!resultArray){
-            const error=new Error('No Data found...');
-            error.statusCode=422;
-            throw error;
-        }
-        let start=(page-1)*RECORDS_PER_PAGE;
-        let index=0;
-        let recordArray=[];
-        record=(page*RECORDS_PER_PAGE);
-        // adding pagination
-        for(let i=start;i<record;i++){
-            if(record.length<resultArray.length){
-                recordArray[index]=resultArray[i];
-                // recordArray.push(resultArray[i])
-                ++index;
-            }
-            else{ 
-                if(resultArray.length<10 && resultArray.length>index){
-                    recordArray[index]=resultArray[i];
-                    ++index;
-                    continue;
-                }
-                else{
-                    break;
-                }
-            }
-        }
-        return res.status(200).json(recordArray);
+        return res.status(200).json(result);
     }
     catch(error){
         if(!error.statusCode){
             error.statusCode=500;
         }
-        next(error);
+        throw error;
     }
 }
+
+// // fetching data by price
+// module.exports.FindEventByPrice=async(req,res,next)=>{
+//     try{
+//         // requested parameters
+//         let {price}=req.body;
+//         let page = req.body.page||1;
+//         // fetchings events
+//         const result=await Event.find();
+//         // throws error if record failed
+//         if(!result){
+//             const error=new Error('No Data found...');
+//             error.statusCode=422;
+//             throw error;
+//         }
+//          let resultArray=[];
+//          // storing data in resultArray if records are lower then requested price
+//          resultArray=result.filter(event=>{
+//             if(event.ticketPrice<=price){
+//                return resultArray.push(event);
+//             }
+//         });
+//         // throws error if records are not find
+//         if(!resultArray){
+//             const error=new Error('No Data found...');
+//             error.statusCode=422;
+//             throw error;
+//         }
+//         let start=(page-1)*RECORDS_PER_PAGE;
+//         let index=0;
+//         let recordArray=[];
+//         record=(page*RECORDS_PER_PAGE);
+//         // adding pagination
+//         for(let i=start;i<record;i++){
+//             if(record.length<resultArray.length){
+//                 recordArray[index]=resultArray[i];
+//                 // recordArray.push(resultArray[i])
+//                 ++index;
+//             }
+//             else{ 
+//                 if(resultArray.length<10 && resultArray.length>index){
+//                     recordArray[index]=resultArray[i];
+//                     ++index;
+//                     continue;
+//                 }
+//                 else{
+//                     break;
+//                 }
+//             }
+//         }
+//         return res.status(200).json(recordArray);
+//     }
+//     catch(error){
+//         if(!error.statusCode){
+//             error.statusCode=500;
+//         }
+//         next(error);
+//     }
+// }
 

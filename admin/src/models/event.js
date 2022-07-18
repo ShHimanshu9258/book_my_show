@@ -50,11 +50,6 @@ const eventSchema=new Schema({
     venueLocation:{
         type:Object,
         required:true
-    },
-    serviceAvailable:{
-        type:mongoose.SchemaTypes.Boolean,
-        default:false,
-        required:true
     }
 },{
     toJSON:{

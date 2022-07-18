@@ -19,6 +19,7 @@ const isSuperAdmin=require('../middleware/is-superadmin');
 const isAdmin=require('../middleware/is-admin');
 
 
+
 // getting admin by superAdmin
 // http://localhost:3002/
 router.get('/get-admin',isAuth,isSuperAdmin,GetAdmin);

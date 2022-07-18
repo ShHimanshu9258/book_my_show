@@ -45,25 +45,6 @@ module.exports.ValidateSignature= async(req)=>{
         return null;
 };
 
-// common method which will fetch the users data accroding to there role
-module.exports.GetDataAccordingRole=async(role)=>{
-    try{
-        const users=await User.find();
-        if(users){
-            let resultArray=[];
-                resultArray=users.filter(users=>{
-                    if(users.roles===role){
-                      return  resultArray.push(users);
-                    }
-            });
-            return resultArray;
-        }
-        return null;
-    }   
-    catch(error){
-        console.log(error);
-    }
-};
 
 // common method which is use to fetch data according to there id it will take 2 parameters
 // 1 id and 2. table name 
