@@ -2,7 +2,7 @@
 const User=require('../models/user');
 const Address=require('../models/address');
 // importing reusable function from utility
-const {GeneratePassword,GenerateSalt,GenerateSignature, GetDataByEmail, ValidatePassword, GetDataById, RemoveDataById}=require('../utility');
+const {GeneratePassword,GenerateSalt,GenerateSignature, ValidatePassword, GetDataById,  GenerateOtp, onRequestOTP}=require('../utility');
 // importing axios for cross api call
 const axios=require('axios');
 // importing express-validator for validation purpose
@@ -66,13 +66,17 @@ module.exports.CreteUser=async(req,res,next)=>{
          const salt=await GenerateSalt();
          // generating password it will take 2 parameters 1.password 2.salt 
          const userPassword=await GeneratePassword(password,salt);
+         // generating otp
+         const {otp,expiry}=await GenerateOtp();
          const user=new User({
             email:email,
             phone:phone,
             address:[],
             name:name,  
             password:userPassword,
-            salt:salt
+            salt:salt,
+            otp:otp,
+            otp_expiry:expiry
         });
         const result=await user.save();
         // throws error if db operation failed
@@ -84,6 +88,84 @@ module.exports.CreteUser=async(req,res,next)=>{
          // generating signature by parameters
              const token = await GenerateSignature({ email: result.email, id: result._id});
              return res.status(201).json({id: result._id, token });
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+// verified user
+module.exports.VerifyUser=async(req,res,next)=>{
+    try{
+        const {otp}=req.body;
+        const user=req.user;
+        if(!user){
+            const error=new Error('You are not login Please login first');
+            error.statusCode=422;
+            throw error;
+        }
+        const profile=await GetDataById(user.id,User);
+        if(profile.otp===parseInt(otp) && profile.otp_expiry> new Date()){
+            profile.verified= !profile.verified;
+            const result=await profile.save();
+            if(!result){
+                const error=new Error('You are not login Please login first');
+                error.statusCode=422;
+                throw error;
+            }
+            const signature=await GenerateSignature({
+                _id:result._id.toString(),
+                email:result.email,
+                verified:result.verified
+            });
+
+            return res.status(201).json({
+                signature:signature,
+                verified:result.verified,
+                email:result.email
+            });
+        }
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+
+module.exports.RequestOtp=async(req,res,next)=>{
+    try{
+        const user=req.user;
+        if(!user){
+            const error=new Error('You are not login Please login first');
+            error.statusCode=422;
+            throw error;
+        }
+        const userProfile=await GetDataById(user.id,User);
+        if(!userProfile){
+            const error=new Error('User not find with this id');
+            error.statusCode=422;
+            throw error;
+        }
+        const {otp,expiry}=await GenerateOtp();
+        userProfile.otp=otp;
+        userProfile.otp_expiry=expiry;
+        const result=await userProfile.save();
+        if(!result){
+            const error=new Error('OOPS!! no record updated , Please try again');
+            error.statusCode=422;
+            throw error;
+        }
+       const otpSendResult= await onRequestOTP(otp,result.phone);
+       if(!otpSendResult){
+            const error=new Error('OOPS!! Otp did not sent , Please try again');
+            error.statusCode=422;
+            throw error;
+       }
+       return res.status(200).json({message:'OTP sent to your registerd mobile no....'});
     }
     catch(error){
         if(!error.statusCode){
@@ -212,7 +294,7 @@ module.exports.GettingUsersData= async(req,res,next)=>{
             throw error;
         }
         // find records
-        const users=await User.find()
+        const users=await User.find({verified:true})
         .sort({ createdAt: -1 })
         .skip((page - 1) * RECORDS_PER_PAGE)
         .limit(RECORDS_PER_PAGE);

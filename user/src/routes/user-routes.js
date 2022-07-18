@@ -13,7 +13,9 @@ const {
     CancelTicket,
     CheckingTicketBooking,
     SearchingByParameter,
-    FindByPrice
+    FindByPrice,
+    VerifyUser,
+    RequestOtp
 }=require('../controller/user-controller');
 // importing express-validator for validating data
 const {body}=require('express-validator');
@@ -24,6 +26,9 @@ const isAuth=require('../middleware/is-Auth');
 // searching event by price
 // http://localhost:4002/searchByPrice
 router.get('/searchByPrice',isAuth,FindByPrice);
+
+//request otp
+router.get('/otprequest',isAuth,RequestOtp);
 
 // searching event by parameters
 // http://localhost:4002/searching
@@ -70,6 +75,10 @@ router.post('/user-login',[
 router.patch('/update-address',[
     body('pincode').isLength({min:6}).withMessage("Pincode length should be 6 digit long")
 ],isAuth,UpdateAddress);
+
+// verify user
+// http://localhost:4002/verify-user
+router.patch('/verify-user',isAuth,VerifyUser);
 
 // ticket booking
 // http://localhost:4002/ticket-booking/id

@@ -23,6 +23,7 @@
     "jsonwebtoken": "^8.5.1",
     "mocha": "^10.0.0",
     "mongoose": "^6.4.3",
-    "sinon": "^14.0.0"
+    "sinon": "^14.0.0",
+    "twilio": "^3.79.0"
   }
 }

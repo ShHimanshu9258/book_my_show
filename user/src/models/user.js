@@ -27,7 +27,16 @@ const userSchema=new Schema({
         ref:'address',
         required:true
     }],
-   
+    otp: {
+        type: Number
+    },
+    otp_expiry: {
+        type: Date
+    },
+    verified:{
+        type:Boolean,
+        default:false
+    }
 },
     {
         toJSON:{
