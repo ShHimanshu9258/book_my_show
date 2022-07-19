@@ -15,7 +15,7 @@ const {
     CancelTicketBooking,
     FetchingTicketBookingDetails,
     SearchingByParameter,
-    FindEventByPrice,
+    //FindEventByPrice,
     
 }=require('../controller/venue-controller');
 
@@ -50,7 +50,7 @@ router.post('/venueadmin-login',[
 
 // searching price filter by user
 //http://localhost:3002/searcheventbyprice
-router.post('/searcheventbyprice',FindEventByPrice);
+//router.post('/searcheventbyprice',FindEventByPrice);
 
 // ticket booking by user
 //http://localhost:3002/booking-seats/venueId

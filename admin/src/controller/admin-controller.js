@@ -17,6 +17,7 @@ const dotenv=require('dotenv').config;
 
 // global variables dec
 const RECORDS_PER_PAGE=`${process.env.RECORDS_PER_PAGE}`;
+const API_PATH=`${process.env.API_PATH}`;
 /**
  * switch role of a venueAdmin to admin and vice-versa by super admin
  * @param {req} req
@@ -258,8 +259,8 @@ module.exports.GettingUserFromUserPortal= async(req,res,next)=>{
     try{
         // it will fetching data from user service
         const page=req.query.page || 1;
-        
-        const response=await axios.get(`http://localhost:4002/get-userdata?page=${page}`);
+        console.log(`${API_PATH}/get-userdata?page=${page}`);
+        const response=await axios.get(`${API_PATH}/get-userdata?page=${page}`);
         // throws error if no users founds
         if(response===null){
             const error=new Error('No record found please try again');
@@ -280,7 +281,7 @@ module.exports.RemoveUserFromUserService=async(req,res,next)=>{
     try{
         const id=req.params.id;
         // calling user from different service and remove
-        const response=await axios.delete(`http://localhost:4002/removeuserbyid/${id}`);
+        const response=await axios.delete(`${API_PATH}/removeuserbyid/${id}`);
         if(response===null){
             const error=new Error('No record found please try again');
             error.statusCode=422;

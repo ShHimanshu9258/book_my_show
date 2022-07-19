@@ -13,7 +13,7 @@ const {
     CancelTicket,
     CheckingTicketBooking,
     SearchingByParameter,
-    FindByPrice,
+    //FindByPrice,
     VerifyUser,
     RequestOtp
 }=require('../controller/user-controller');
@@ -25,7 +25,7 @@ const isAuth=require('../middleware/is-Auth');
 
 // searching event by price
 // http://localhost:4002/searchByPrice
-router.get('/searchByPrice',isAuth,FindByPrice);
+// router.get('/searchByPrice',isAuth,FindByPrice);
 
 //request otp
 router.get('/otprequest',isAuth,RequestOtp);

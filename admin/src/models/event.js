@@ -39,7 +39,7 @@ const eventSchema=new Schema({
          required:true
      },
      ticketPrice:{
-        type:Number,
+        type:String,
         required:true
      },
      registrationId:{

@@ -11,6 +11,15 @@ const adminController=require('../controller/admin-controller');
 // importing axios 
 const axios=require('axios').default;
 
+// importing mongoose
+const mongoose=require('mongoose');
+
+// importing dotenv for getting enviroment variables
+const dotenv=require('dotenv').config();
+
+// declaring global variables
+const TEST_DB_URI=`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.qnaxe.mongodb.net/${process.env.MONGO_TEST_DB}`;
+
 
 
 describe('Admin-Controller Testing',function(){
@@ -19,9 +28,9 @@ describe('Admin-Controller Testing',function(){
         it('Should throws an error 500 if db operation failed',function(){
             // this function is used for calling methods
             // it will take 2 parameters 1 .functionClass and 2. Methods or function name
-            sinon.stub(utility,'GetDataAccordingRole');
+            sinon.stub(User,'find');
             // throws error for particular method
-            utility.GetDataAccordingRole.throws();
+            User.find.throws();
             // requesting method vaue
             const req={
                 get:function(role){
@@ -34,12 +43,12 @@ describe('Admin-Controller Testing',function(){
                 expect(result).to.have.property('statusCode',500);
             });
             // restoring the value
-            utility.GetDataAccordingRole.restore();
+            User.find.restore();
         })
         // if error is 422 means if data not found
         it('Should throws an error 422 if No data found',function(){
-            sinon.stub(utility,'GetDataAccordingRole');
-            utility.GetDataAccordingRole.throws();
+            sinon.stub(User,'find');
+            User.find.throws();
             const req={
                 get:function(role){
                     return null;
@@ -49,14 +58,14 @@ describe('Admin-Controller Testing',function(){
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
             });
-            utility.GetDataAccordingRole.restore();
+            User.find.restore();
         })
     })
     describe('GetVenueAdmins-role',function(){
         // if db operation failed
         it('Should throws an error 500 if db operation failed',function(){
-            sinon.stub(utility,'GetDataAccordingRole');
-            utility.GetDataAccordingRole.throws();
+            sinon.stub(User,'find');
+            User.find.throws();
             const req={
                 get:function(role){
                     return null;
@@ -67,12 +76,12 @@ describe('Admin-Controller Testing',function(){
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',500);
             });
-            utility.GetDataAccordingRole.restore();
+            User.find.restore();
         })
         // if data not found
         it('Should throws an error 422 if No data found',function(){
-            sinon.stub(utility,'GetDataAccordingRole');
-            utility.GetDataAccordingRole.throws();
+            sinon.stub(User,'find');
+            User.find.throws();
             const req={
                 get:function(role){
                     return null;
@@ -82,12 +91,28 @@ describe('Admin-Controller Testing',function(){
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',422);
             });
-            utility.GetDataAccordingRole.restore();
+            User.find.restore();
         })
     })
     describe('Create user',function(){
+        before(function (done) {
+            mongoose
+                .connect(TEST_DB_URI)
+                .then(() => {
+                    const restaurant = new User({
+                        email:'test@test.com',
+                        phone:'1234567890',
+                        address:'[]',
+                        name:'test',  
+                        password:'test123',
+                        salt:'test123'
+                    })
+                    return restaurant.save();
+                })
+            done()
+        })
          // if db operation failed
-        it('it should through an error if user is already exist ',function(){
+         it('it should through an error if user is already exist ',function(){
             sinon.stub(User,'findOne');
             User.findOne.throws();
             const req={
@@ -154,6 +179,17 @@ describe('Admin-Controller Testing',function(){
             });
             User.create.restore();
         })
+        after(function (done) {
+            User.deleteMany({})
+                .then(() => {
+                    return mongoose.disconnect();
+                })
+                .then(() => {
+                    done();
+                });
+        });
+
+        
     })
     describe('Admin controller Signin',function(){
         // if db operation failed
@@ -193,6 +229,26 @@ describe('Admin-Controller Testing',function(){
         })
     });
     describe('Add Venue',function(){
+        before(function (done) {
+            mongoose
+                .connect(TEST_DB_URI)
+                .then(() => {
+                    const restaurant = new Event({
+                    event:'someevent',
+                    venueType:'testvenue',
+                    registrationId:'12345njdbvdjdbnjnjds2',
+                    timing:'22-04-30',
+                    totalSeats:'150',
+                    remaningAvailableSeats:'150',
+                    ticketPrice:'someticket',
+                    postponeEvent:'[]',
+                    venueLocation:'address',
+                    ratings:'ratings',
+                    })
+                    return restaurant.save();
+                })
+            done()
+        })
         // if db operation failed
         it('Should throws an error 500 if db operation fails',function(){
             sinon.stub(Event,'findOne');
@@ -234,6 +290,16 @@ describe('Admin-Controller Testing',function(){
             });
             Event.create.restore();
         })
+        after(function (done) {
+            Event.deleteMany({})
+                .then(() => {
+                    return mongoose.disconnect();
+                })
+                .then(() => {
+                    done();
+                });
+                done();
+        });
     })
     describe('Remove Admin by superAdmin',function(){
         // if db operation failed

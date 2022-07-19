@@ -4,9 +4,15 @@ const userController=require('../controller/user-controller');
 const utility=require('../utility');
 const User=require('../models/user');
 const axios = require('axios').default;
+const mongoose=require('mongoose');
+const dotenv=require('dotenv').config();
+
+// global variables decleration
+const TEST_DB_URI=`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.qnaxe.mongodb.net/${process.env.MONGO_TEST_DB}`;
+
 describe('User Controller',function(){
     describe('User controller Signin',function(){
-        it('Should throw an error with code 500 if accessing the database fails',function(){
+        it('Should throw an error with code 500 if accessing the database fails',function(done){
             sinon.stub(User,'findOne');
             User.findOne.throws();
 
@@ -20,6 +26,7 @@ describe('User Controller',function(){
                 // console.log(result);
                 expect(result).to.be.an('error');
                 expect(result).to.have.property('statusCode',500);
+                done();
             });
             User.findOne.restore();
         });
@@ -78,6 +85,22 @@ describe('User Controller',function(){
         });
     });
     describe('Create user',function(){
+        before(function (done) {
+            mongoose
+                .connect(TEST_DB_URI)
+                .then(result => {
+                    const restaurant = new User({
+                    email:'test@test.com',
+                    phone:'1234567890',
+                    address:'[]',
+                    name:'test',  
+                    password:'test123',
+                    salt:'test123'
+                    })
+                    return restaurant.save();
+                })
+            done()
+        })
         it('it should through an error if user is already exist ',function(){
             sinon.stub(User,'findOne');
             User.findOne.throws();
@@ -139,6 +162,16 @@ describe('User Controller',function(){
             });
             User.create.restore();
         })
+        after(function (done) {
+            User.deleteMany({})
+                .then(() => {
+                    return mongoose.disconnect();
+                })
+                .then(() => {
+                    done();
+                });
+        });
+        
     });  
     describe('Getting user profile',function(){
         it('it should return an error while db operation failed',function(){
@@ -387,36 +420,6 @@ describe('User Controller',function(){
                 expect(result).to.have.property('statusCode',500);
             });
             axios.get.restore();
-        })
-    })
-    describe('FindByPrice - venue',function(){
-        it('Should throw an error if response is null',function(){
-            sinon.stub(axios,'post');
-            axios.post.throws();
-            const req={
-                query:{
-                    searchingParmas:'params'
-                }
-            }
-            userController.FindByPrice(req,{},()=>{}).then(result=>{
-                expect(result).to.be.an('error');
-                expect(result).to.have.property('statusCode',422);
-            });
-            axios.post.restore();
-        })
-        it('Should throw an error if ',function(){
-            sinon.stub(axios,'post');
-            axios.post.throws();
-            const req={
-                query:{
-                    searchingParmas:'params'
-                }
-            }
-            userController.FindByPrice(req,{},()=>{}).then(result=>{
-                expect(result).to.be.an('error');
-                expect(result).to.have.property('statusCode',500);
-            });
-            axios.post.restore();
         })
     })
 });

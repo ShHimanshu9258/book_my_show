@@ -12,6 +12,7 @@ const dotenv=require('dotenv').config();
 
 // global variable decleration
 const RECORDS_PER_PAGE=`${process.env.RECORDS_PER_PAGE}`;
+const API_PATH=`${process.env.API_PATH}`;
 
 /**
  * 
@@ -270,7 +271,7 @@ module.exports.GetSeatAvailability=async(req,res,next)=>{
     try{
         const id=req.params.id;
         // cross api call
-        const response=await axios.get(`http://localhost:3002/venue-seatavailable/${id}`);
+        const response=await axios.get(`${API_PATH}/venue-seatavailable/${id}`);
         // throws error if response is null
         if(response===null){
             const error=new Error('No revord find with this id');
@@ -342,7 +343,7 @@ module.exports.GettingVenues=async(req,res,next)=>{
     try{
         const page=req.query.page || 1;
         // crossapi checking if response is null then throws error
-        const response=await axios.get(`http://localhost:3002/gettingvenuesbyratings?page=${page}`);
+        const response=await axios.get(`${API_PATH}/gettingvenuesbyratings?page=${page}`);
         if(response===null){
             const error=new Error('No revord find with this id');
             error.statusCode=422;
@@ -373,7 +374,7 @@ module.exports.TicketBooking=async (req,res,next)=>{
             throw error;
         }
         // cross api call and sending data throws error if response is null
-        const response=await axios.post(`http://localhost:3002/booking-seats/${venueId}`,{
+        const response=await axios.post(`${API_PATH}/booking-seats/${venueId}`,{
             user:user,
             noOfTickets:noOfTickets
         });
@@ -406,7 +407,7 @@ module.exports.CancelTicket=async(req,res,next)=>{
             throw error;
         }
         // cross api call and sending parameters throws error if response is null
-        const response=await axios.post(`http://localhost:3002/cancel-ticketbooking/${venueId}`,{
+        const response=await axios.post(`${API_PATH}/cancel-ticketbooking/${venueId}`,{
             user:user,
             noOfTickets:noOfTickets,
             bookingId:bookingId
@@ -432,7 +433,7 @@ module.exports.CheckingTicketBooking=async(req,res,next)=>{
         // requesting parameters
         const ticketId=req.params.id;
         // cross api call throws error if response is null
-        const response=await axios.get(`http://localhost:3002/booking-details/${ticketId}`,{
+        const response=await axios.get(`${API_PATH}/booking-details/${ticketId}`,{
             headers:{
                 Autherization:req.signature
             }
@@ -464,7 +465,7 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
             throw error;
           }
           // cross api call
-          const response=await axios.get(`http://localhost:3002/searchevent?search=${searchingParameter} & page=${page}`);
+          const response=await axios.get(`${API_PATH}/searchevent?search=${searchingParameter} & page=${page}`);
           if(!response){
             // console.log('inside response failed');
             const error=new Error('OOPS!! error occured No response get ');
@@ -481,36 +482,36 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
         next(error);
     }
 }
-// finding event according by price
-module.exports.FindByPrice= async(req,res,next)=>{
-    try{
-          const price=req.query.price;
-          const page=req.query.page ||1;
+// // finding event according by price
+// module.exports.FindByPrice= async(req,res,next)=>{
+//     try{
+//           const price=req.query.price;
+//           const page=req.query.page ||1;
 
-          if(price===null ||price===undefined){
-            const error =new Error('Searching parameters are empty');
-            error.statusCode=422;
-            throw error;
-          }
-          const response=await axios.post(`http://localhost:3002/searcheventbyprice`,{
-            price:price,
-            page:page
-          });
-          if(!response){
-            // console.log('inside response failed');
-            const error=new Error('OOPS!! error occured No response get ');
-            error.statusCode=422;
-            throw error;
-        }
-        return res.status(200).json(response.data);
-    }
+//           if(price===null ||price===undefined){
+//             const error =new Error('Searching parameters are empty');
+//             error.statusCode=422;
+//             throw error;
+//           }
+//           const response=await axios.post(`http://localhost:3002/searcheventbyprice`,{
+//             price:price,
+//             page:page
+//           });
+//           if(!response){
+//             // console.log('inside response failed');
+//             const error=new Error('OOPS!! error occured No response get ');
+//             error.statusCode=422;
+//             throw error;
+//         }
+//         return res.status(200).json(response.data);
+//     }
 
-    catch(error){
-        if(!error.statusCode){
-            error.statusCode=500;
-        }
-        next(error);
-    }
-}
+//     catch(error){
+//         if(!error.statusCode){
+//             error.statusCode=500;
+//         }
+//         next(error);
+//     }
+// }
 
 

@@ -12,6 +12,7 @@ const {validationResult}=require('express-validator');
 // global variable decleration
 const RECORDS_PER_PAGE=`${process.env.RECORDS_PER_PAGE}`;
 
+
 // importing reusable functions from utility/index.js
 const {GenerateSignature,ValidatePassword,GetDataByEmail, GetDataById, RemoveDataById}=require('../utility');
 
@@ -433,15 +434,23 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
     try{
         // requested paramaters
         const filters=req.query.search;
+        const page=req.query.page ||1;
+        console.log(filters);
         // fetching details
         const result=await Event.find({
-            '$or':[
-                { event: { '$regex': filters, $options: "i" } },
-                { venueType: { '$regex': filters, $options: "i" } },
-                {venueLocation:{'$regex':filters, $options:"i"}},
+            $or :[
+                {ticketPrice:{$lte:filters}},
+                { event: { $regex: /filters/ , $options: 'i'} },
+                { venueType: { '$regex': filters, $options: 'i' } },
+                {venueLocation:{'$elemMatch':{city:filters} }}
             ]
-        });
-        if(!result){
+        })
+        .sort({createdAt:-1})
+        .skip((page - 1) * RECORDS_PER_PAGE)
+        .limit(RECORDS_PER_PAGE);
+        
+        // console.log(result);
+        if(result.length<=0){
             const error=new Error('OOPS!! No data found');
             error.statusCode=422;
             throw error;
@@ -449,7 +458,6 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
         return res.status(200).json(result);
     }
     catch(error){
-        console.log(error);
         if(!error.statusCode){
             error.statusCode=500;
         }
