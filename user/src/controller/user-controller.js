@@ -166,6 +166,7 @@ module.exports.RequestOtp=async(req,res,next)=>{
             throw error;
         }
        const otpSendResult= await onRequestOTP(otp,result.phone);
+       console.log(otpSendResult);
        if(!otpSendResult){
             const error=new Error('OOPS!! Otp did not sent , Please try again');
             error.statusCode=422;
@@ -271,7 +272,11 @@ module.exports.GetSeatAvailability=async(req,res,next)=>{
     try{
         const id=req.params.id;
         // cross api call
-        const response=await axios.get(`${API_PATH}/venue-seatavailable/${id}`);
+        const response=await axios.get(`${API_PATH}/venue-seatavailable/${id}`,{
+            headers:{
+                Authorization:req.signature
+            }
+        });
         // throws error if response is null
         if(response===null){
             const error=new Error('No revord find with this id');
@@ -319,7 +324,7 @@ module.exports.RemoveUserFromDatabase=async(req,res,next)=>{
     try{
         //const result=await RemoveDataById(req.params.id,User);
         // fetching user by id and remove if no match found throws error
-        const result=await User.findByIdAndRemove(id);
+        const result=await User.findByIdAndRemove(req.params.id);
         if(!result){
             const error=new Error('No data find with this id,Use different one');
             error.statusCode=422;
@@ -343,7 +348,11 @@ module.exports.GettingVenues=async(req,res,next)=>{
     try{
         const page=req.query.page || 1;
         // crossapi checking if response is null then throws error
-        const response=await axios.get(`${API_PATH}/gettingvenuesbyratings?page=${page}`);
+        const response=await axios.get(`${API_PATH}/gettingvenuesbyratings?page=${page}`,{
+            headers:{
+                Authorization:req.signature
+            }
+        });
         if(response===null){
             const error=new Error('No revord find with this id');
             error.statusCode=422;
@@ -376,7 +385,10 @@ module.exports.TicketBooking=async (req,res,next)=>{
         // cross api call and sending data throws error if response is null
         const response=await axios.post(`${API_PATH}/booking-seats/${venueId}`,{
             user:user,
-            noOfTickets:noOfTickets
+            noOfTickets:noOfTickets,
+            headers:{
+                Authorization:req.signature
+            }
         });
         if(response===null){
             const error=new Error('OOPS!! error occured Please try again');
@@ -400,7 +412,7 @@ module.exports.CancelTicket=async(req,res,next)=>{
         const {noOfTickets,bookingId}=req.body;
         // const user=await GetDataById(req.user.id,User);
         // fetching data by id throws error if no data found
-        const user=await findById(req.user.id);
+        const user=await User.findById(req.user.id);
         if(!user){
             const error=new Error('No user find with this id');
             error.statusCode=422;
@@ -410,7 +422,10 @@ module.exports.CancelTicket=async(req,res,next)=>{
         const response=await axios.post(`${API_PATH}/cancel-ticketbooking/${venueId}`,{
             user:user,
             noOfTickets:noOfTickets,
-            bookingId:bookingId
+            bookingId:bookingId,
+            headers:{
+                Authorization:req.signature
+            }
         });
         if(response===null){
             const error=new Error('OOPS!! error occured Please try again');
@@ -465,7 +480,11 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
             throw error;
           }
           // cross api call
-          const response=await axios.get(`${API_PATH}/searchevent?search=${searchingParameter} & page=${page}`);
+          const response=await axios.get(`${API_PATH}/searchevent?search=${searchingParameter} & page=${page}`,{
+            headers:{
+                Authorization:req.signature
+            }
+          });
           if(!response){
             // console.log('inside response failed');
             const error=new Error('OOPS!! error occured No response get ');

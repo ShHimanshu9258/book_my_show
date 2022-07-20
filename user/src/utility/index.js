@@ -34,16 +34,21 @@ module.exports.ValidateSignature= async(req)=>{
         return null;
 };
 
-module.exports.GenerateOtp= async()=>{
+module.exports.GenerateOtp =async () =>  {
+
     const otp = Math.floor(10000 + Math.random() * 900000);
     let expiry = new Date()
     expiry.setTime(new Date().getTime() + (30 * 60 * 1000));
+
     return {otp, expiry};
 }
 
 module.exports.onRequestOTP= async (otp,toPhoneNumber)=>{
+    console.log(toPhoneNumber);
+    // const accountSid='SK160db495947dfdf2a94345c359b5579a';
+    // const authTaken='84viWMwQo27EFgEgc55vOyOBqepqWtn6';
     const accountSid='ACb185f67796dfaa981faa9e531268f69c';
-    const authTaken='e7a11d4e3667ef138f27fb3936698d2c';
+    const authTaken='3f42690c5f440420fa1b272cc450ad70'
     const client=require('twilio')(accountSid,authTaken);
 
     const response = await client.messages

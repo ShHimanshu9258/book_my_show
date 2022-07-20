@@ -21,19 +21,19 @@ const isAdmin=require('../middleware/is-admin');
 
 
 // getting admin by superAdmin
-// http://localhost:3002/
+// {{URL}}/get-admin
 router.get('/get-admin',isAuth,isSuperAdmin,GetAdmin);
 
 // get venueadmin
-// http://localhost:3002/
+// {{URL}}/get-venderAdmin
 router.get('/get-venderAdmin',isAuth,isAdmin,GetVenueAdmin);
 
 // getting user data from another service
-// http://localhost:3002/
+// {{URL}}/get-userdata
 router.get('/get-userdata',isAuth,isAdmin,GettingUserFromUserPortal);
 
 // creating admin
-// http://localhost:3002/create-admin
+// {{URL}}/create-admin
 router.post('/create-admin',[
     body('email').trim().isEmail().withMessage("Please enter a valid email"),
     body('password').trim().isLength({min:6}).withMessage("Password length should be atlist 6 digit long"),
@@ -42,7 +42,7 @@ router.post('/create-admin',[
 ], CreateAdmin);
 
 // login user
-// http://localhost:3002/login-user
+// {{URL}}/login-user
 router.post('/login-user',[
     body('email').trim().isEmail().withMessage("Please enter a valid email"),
     body('password').trim().isLength({min:6}).withMessage("Password length should be atlist 6 digit long")
@@ -51,7 +51,7 @@ router.post('/login-user',[
 
 
 // adding venue by admin
-// http://localhost:3002/create-venue-byadmin
+// {{URL}}/create-venue-byadmin
 router.post('/create-venue-byadmin',[
     body('venueType').trim().isLength({min:4}).withMessage("venueType Length should be 4 digit long"),
     body('event').trim().isLength({min:4}).withMessage("event Length should be 4 digit long"),
@@ -60,15 +60,15 @@ router.post('/create-venue-byadmin',[
 
 
 // Removing admin by superAdmin
-// http://localhost:3002/remove-adminbyid/adminId
+// {{URL}}/remove-adminbyid/adminId
 router.delete('/remove-adminbyid/:id',isAuth,isSuperAdmin,RemoveAdminById);
 
 // Removing venue  by admin
-// http://localhost:3002/remove-venuebyid/venueId
+// {{URL}}/remove-venuebyid/venueId
 router.delete('/remove-venuebyid/:id',isAuth,isAdmin,RemoveVenueById);
 
 // Removing user by Admin
-// http://localhost:3002/remove-userbyid/userId
+// {{URL}}/remove-userbyid/userId
 router.delete('/remove-userbyid/:id',isAuth,isAdmin,RemoveUserFromUserService);
 
 module.exports=router;

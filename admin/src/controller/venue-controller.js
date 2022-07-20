@@ -376,9 +376,11 @@ module.exports.CancelTicketBooking= async(req,res,next)=>{
             error.statusCode=422;
             throw error;
         }
+        console.log(event);
         event.remaningAvailableSeats=event.remaningAvailableSeats+noOfTickets;
-        event.cancelBooking.push(cancelBookingResult);
+        //event.cancelBooking.push(cancelBookingResult._id);
         const eventResult=await event.save();
+        console.log(eventResult);
         await RemoveDataById(bookingId,BookingModel);
         if(!eventResult){
             // removing data from cancel booking table 
@@ -445,10 +447,6 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
                 {venueLocation:{'$elemMatch':{city:filters} }}
             ]
         })
-        .sort({createdAt:-1})
-        .skip((page - 1) * RECORDS_PER_PAGE)
-        .limit(RECORDS_PER_PAGE);
-        
         // console.log(result);
         if(result.length<=0){
             const error=new Error('OOPS!! No data found');

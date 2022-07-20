@@ -24,38 +24,38 @@ const router=express.Router();
 const isAuth=require('../middleware/is-Auth');
 
 // searching event by price
-// http://localhost:4002/searchByPrice
+// {{URL}}/searchByPrice
 // router.get('/searchByPrice',isAuth,FindByPrice);
 
 //request otp
 router.get('/otprequest',isAuth,RequestOtp);
 
 // searching event by parameters
-// http://localhost:4002/searching
+// {{URL}}/searching
 router.get('/searching',isAuth,SearchingByParameter);
 
 // getting user profile by id
-// http://localhost:4002/get-user
+// {{URL}}/get-user
 router.get('/get-user',isAuth,GetUserProfileById);
 
 // getting user data by admin 
-// http://localhost:4002/get-userdata
+// {{URL}}/get-userdata
 router.get('/get-userdata',GettingUsersData);
 
 // getting top venue details by venue service
-// http://localhost:4002/get-topvenues
+// {{URL}}/get-topvenues
 router.get('/get-topvenues',isAuth,GettingVenues);
 
 // checking ticket availability by venue service
-// http://localhost:4002/ticket-bookingdetails/:id
+// {{URL}}/ticket-bookingdetails/:id
 router.get('/ticket-bookingdetails/:id',isAuth,CheckingTicketBooking);
 
 // seat availability
-// http://localhost:4002/get-seats-availability/id
+// {{URL}}/get-seats-availability/id
 router.get('/get-seats-availability/:id',isAuth,GetSeatAvailability);
 
 // create user
-// http://localhost:4002/create-user
+// {{URL}}/create-user
 router.post('/create-user',[
     body('email').trim().isEmail().withMessage("Please enter a valid email"),
     body('password').trim().isLength({min:6}).withMessage("Password Length should be atlist 6 digit long"),
@@ -64,32 +64,32 @@ router.post('/create-user',[
 ],CreteUser);
 
 // login user
-// http://localhost:4002/user-login
+// {{URL}}/user-login
 router.post('/user-login',[
     body('email').trim().isEmail().withMessage("Please enter a valid email id"),
     body('password').trim().isLength({min:6}).withMessage("Password Length should be atlist 6 digit long")
 ],UserSignIn);
 
 // update user address
-// http://localhost:4002/update-address
+// {{URL}}/update-address
 router.patch('/update-address',[
     body('pincode').isLength({min:6}).withMessage("Pincode length should be 6 digit long")
 ],isAuth,UpdateAddress);
 
 // verify user
-// http://localhost:4002/verify-user
+// {{URL}}/verify-user
 router.patch('/verify-user',isAuth,VerifyUser);
 
 // ticket booking
-// http://localhost:4002/ticket-booking/id
+// {{URL}}/ticket-booking/id
 router.patch('/ticket-booking/:id',isAuth,TicketBooking);
 
 // cancel ticket booking
-// http://localhost:4002/cancel-ticketBooking/ticketbookingId
+// {{URL}}/cancel-ticketBooking/ticketbookingId
 router.patch('/cancel-ticketBooking/:id',isAuth,CancelTicket);
 
 // remove user by admin
-// http://localhost:4002/removeuserbyid/userId
+// {{URL}}/removeuserbyid/userId
 router.delete('/removeuserbyid/:id',RemoveUserFromDatabase);
 
 module.exports=router;

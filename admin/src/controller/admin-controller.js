@@ -239,7 +239,7 @@ module.exports.RemoveAdminById=async (req,res,next)=>{
 module.exports.RemoveVenueById=async(req,res,next)=>{
     try{
         const id=req.params.id;
-        const result=await RemoveDataById(id,Venue);
+        const result=await RemoveDataById(id,Event);
         // throws error if db op failed
         if(!result){
             const error=new Error('No data removed');
@@ -259,7 +259,11 @@ module.exports.GettingUserFromUserPortal= async(req,res,next)=>{
     try{
         // it will fetching data from user service
         const page=req.query.page || 1;
-        console.log(`${API_PATH}/get-userdata?page=${page}`);
+        console.log(`${API_PATH}/get-userdata?page=${page}`,{
+            headers:{
+                Authentication:req.signature
+            }
+        });
         const response=await axios.get(`${API_PATH}/get-userdata?page=${page}`);
         // throws error if no users founds
         if(response===null){
@@ -281,7 +285,11 @@ module.exports.RemoveUserFromUserService=async(req,res,next)=>{
     try{
         const id=req.params.id;
         // calling user from different service and remove
-        const response=await axios.delete(`${API_PATH}/removeuserbyid/${id}`);
+        const response=await axios.delete(`${API_PATH}/removeuserbyid/${id}`,{
+            headers:{
+                Authentication:req.signature
+            }
+        });
         if(response===null){
             const error=new Error('No record found please try again');
             error.statusCode=422;
