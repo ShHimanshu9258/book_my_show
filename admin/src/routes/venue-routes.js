@@ -1,6 +1,7 @@
 const express=require('express');
 const router=express.Router();
 const {body}=require('express-validator');
+const { BookingDetailsList, CancelBookingDetailsList } = require('../controller/admin-controller');
 // importing controllers methods from venueController
 const {
     VenderSignIn, 
@@ -28,6 +29,9 @@ router.get('/gettingvenuesbyratings',GetTopVenues);
 // search event by parameters
 // {{URL}}/searchevent?search=
 router.get('/searchevent',SearchingByParameter);
+
+router.get('/getbookingdetails',isAuth,isVenueAdmin,BookingDetailsList);
+router.get('/getcancelbookingdetails',isAuth,isVenueAdmin,CancelBookingDetailsList);
 
 // get vender profile by id 
 //{{URL}}/getvenderprofile-byid/someid

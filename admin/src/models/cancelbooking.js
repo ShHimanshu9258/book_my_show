@@ -26,7 +26,11 @@ const cancelSchema=new Schema({
         type:mongoose.SchemaTypes.ObjectId,
         ref:'event',
         required:true
-    }]
+    }],
+    cancelBookingStatus:{
+        type:mongoose.SchemaTypes.Boolean,
+        default:true
+    }
 
 });
 module.exports=mongoose.model('cancel_booking',cancelSchema);

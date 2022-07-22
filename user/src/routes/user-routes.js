@@ -15,7 +15,8 @@ const {
     SearchingByParameter,
     //FindByPrice,
     VerifyUser,
-    RequestOtp
+    RequestOtp,
+    GenerateFakeData
 }=require('../controller/user-controller');
 // importing express-validator for validating data
 const {body}=require('express-validator');
@@ -26,6 +27,8 @@ const isAuth=require('../middleware/is-Auth');
 // searching event by price
 // {{URL}}/searchByPrice
 // router.get('/searchByPrice',isAuth,FindByPrice);
+
+router.get('/fakedata',GenerateFakeData);
 
 //request otp
 router.get('/otprequest',isAuth,RequestOtp);

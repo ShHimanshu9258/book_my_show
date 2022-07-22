@@ -47,8 +47,10 @@ module.exports.onRequestOTP= async (otp,toPhoneNumber)=>{
     console.log(toPhoneNumber);
     // const accountSid='SK160db495947dfdf2a94345c359b5579a';
     // const authTaken='84viWMwQo27EFgEgc55vOyOBqepqWtn6';
+    // const accountSid='ACb185f67796dfaa981faa9e531268f69c';
+    // const authTaken='3f42690c5f440420fa1b272cc450ad70'
     const accountSid='ACb185f67796dfaa981faa9e531268f69c';
-    const authTaken='3f42690c5f440420fa1b272cc450ad70'
+    const authTaken='9582b0105138199a150846d6a9bccdf3';
     const client=require('twilio')(accountSid,authTaken);
 
     const response = await client.messages

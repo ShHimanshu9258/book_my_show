@@ -27,10 +27,11 @@ const userSchema=new Schema({
         type:String,
         default:superAdmin
     },
-    address:{
-        type:Object,
+    address:[{
+        type:mongoose.SchemaTypes.ObjectId,
+        ref:'address',
         required:true
-    },
+    }],
    
 },
     {

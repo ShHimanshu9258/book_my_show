@@ -25,6 +25,10 @@ const BookingSchema=new Schema({
         type:mongoose.SchemaTypes.ObjectId,
         ref:'event',
         required:true
-    }]
+    }],
+    bookingStatus:{
+        type:mongoose.SchemaTypes.Boolean,
+        default:true
+    }
 });
 module.exports=mongoose.model('booking',BookingSchema);

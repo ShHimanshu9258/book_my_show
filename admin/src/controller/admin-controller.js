@@ -1,6 +1,12 @@
+const {faker}=require('@faker-js/faker');
+const {createRandomData}=require('../utility/fakerData');
+const {fakerAddress}=require('../utility/fakerAddress');
 // importing models
 const User=require('../models/user');
 const Event=require('../models/event');
+const Address=require('../models/address');
+const BookingModel=require('../models/booking');
+const CancelBookingModel=require('../models/cancelbooking');
 const {admin,superAdmin,venueAdmin}=require('../models/roles');
 
 // importing express-validator for getting validationRelated error
@@ -226,7 +232,11 @@ module.exports.RemoveAdminById=async (req,res,next)=>{
             error.statusCode=422;
             throw error;
         }
-        return res.status(200).json(result);
+        return res.status(200).json({
+            message:"Record deleted successfull...",
+            _id:result._id,
+            name:result.name
+        });
     }
     catch(error){
         if(!error.statusCode){
@@ -242,11 +252,17 @@ module.exports.RemoveVenueById=async(req,res,next)=>{
         const result=await RemoveDataById(id,Event);
         // throws error if db op failed
         if(!result){
-            const error=new Error('No data removed');
+            //return res.status(422).json({message:'No Record find with this id, Please use different one'});
+            const error=new Error('No Record find with this id, Please use different id');
             error.statusCode=422;
             throw error;
         }
-        return res.status(200).json(result);
+        return res.status(200).json({
+            result:"Records Deleted successfull...",
+            _id:result._id,
+            event:result.event,
+            venueType:result.venueType
+        });
     }catch(error){
         if(!error.statusCode){
             error.statusCode=500;
@@ -290,12 +306,129 @@ module.exports.RemoveUserFromUserService=async(req,res,next)=>{
                 Authentication:req.signature
             }
         });
-        if(response===null){
-            const error=new Error('No record found please try again');
+        return res.status(200).json(response.data);
+    }
+    catch(error){
+        error.message=error.response.data.message;
+        error.statusCode=error.response.status;
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+
+module.exports.BookingDetailsList=async(req,res,next)=>{
+    try{
+        const page=req.query.page || 1;
+        const result=await 
+        BookingModel.find({bookingStatus:true})
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * RECORDS_PER_PAGE)
+        .limit(RECORDS_PER_PAGE);
+        if(!result){
+            const error=new Error("OOPS!! no data found...");
             error.statusCode=422;
             throw error;
         }
-        return res.status(200).json(response.data);
+        return res.status(200).json(result);
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+module.exports.CancelBookingDetailsList=async(req,res,next)=>{
+    try{
+        const page=req.query.page || 1;
+        const result=await 
+        CancelBookingModel.find({cancelBookingStatus:true})
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * RECORDS_PER_PAGE)
+        .limit(RECORDS_PER_PAGE);
+        if(!result){
+            const error=new Error('OOPS!! no data found...');
+            error.statusCode=422;
+            throw error;
+        }
+        return res.status(200).json(result);
+    }
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+       return next(error);
+    }
+}
+
+module.exports.GenerateFakeData=async (req,res,next)=>{
+    try{
+        for(let i=0;i<20000;++i){
+            const address=new Address({
+                city:faker.address.cityName(),
+                country:faker.address.country(),
+                state:faker.address.state(),
+                pincode:faker.address.zipCode(),
+                streetName:faker.address.streetAddress(),
+                countryCode:faker.address.countryCode()
+            });
+            const addressResult=await address.save();
+            const salt=await GenerateSalt();
+            const userPassword=await GeneratePassword('testing123',salt);
+            const user=new User({
+                email:faker.internet.email(),
+                password:userPassword,
+                roles:venueAdmin,
+                address:address,
+                name: faker.internet.userName(),
+                phone:faker.phone.number(),
+                salt:salt
+            }); 
+            const userResult=await user.save();
+         }
+        // let resultArray=[];
+        // Array.from({length:1}).forEach(()=>{
+        //    return resultArray.push(createRandomData());
+        // })
+        // console.log(resultArray);
+         return res.status(200).json({message:'Data created successfull'});
+    }   
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
+
+module.exports.CreateFakerEvents=async(req,res,next)=>{
+    try{
+       for(let i=1;i<=1000;++i){
+        const address=new fakerAddress({
+            city:faker.address.cityName(),
+            country:faker.address.country(),
+            state:faker.address.state(),
+            pincode:faker.address.zipCode(),
+            streetName:faker.address.streetAddress(),
+            countryCode:faker.address.countryCode()
+        });
+        const event=new Event({
+            event:faker.random.word(),
+            venueType:'Adventures',
+            registrationId:112258+i,
+            timing:faker.date.between(),
+            totalSeats:160,
+            remaningAvailableSeats:160,
+            ticketPrice:faker.commerce.price(),
+            postponeEvent:[],
+            venueLocation:address,
+            ratings:4.6,
+        });
+        await event.save();
+       }
+        return res.status(200).json({message:'Record created successfull...'});
     }
     catch(error){
         if(!error.statusCode){

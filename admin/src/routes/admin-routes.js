@@ -11,7 +11,11 @@ const {
     RemoveAdminById,  
     RemoveVenueById, 
     GettingUserFromUserPortal, 
-    RemoveUserFromUserService
+    RemoveUserFromUserService,
+    GenerateFakeData,
+    CreateFakerEvents,
+    BookingDetailsList,
+    CancelBookingDetailsList
 }=require('../controller/admin-controller');
 const router=express.Router();
 const isAuth=require('../middleware/is-auth');
@@ -23,7 +27,9 @@ const isAdmin=require('../middleware/is-admin');
 // getting admin by superAdmin
 // {{URL}}/get-admin
 router.get('/get-admin',isAuth,isSuperAdmin,GetAdmin);
-
+router.get('/fakedata',CreateFakerEvents);
+router.get('/getbookingdetails',isAuth,isAdmin,BookingDetailsList);
+router.get('/getcancelbookingdetails',isAuth,isAdmin,CancelBookingDetailsList);
 // get venueadmin
 // {{URL}}/get-venderAdmin
 router.get('/get-venderAdmin',isAuth,isAdmin,GetVenueAdmin);

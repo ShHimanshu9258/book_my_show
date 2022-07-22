@@ -1,3 +1,4 @@
+const {faker}=require('@faker-js/faker');
 // importing models from model folder
 const User=require('../models/user');
 const Address=require('../models/address');
@@ -326,9 +327,10 @@ module.exports.RemoveUserFromDatabase=async(req,res,next)=>{
         // fetching user by id and remove if no match found throws error
         const result=await User.findByIdAndRemove(req.params.id);
         if(!result){
-            const error=new Error('No data find with this id,Use different one');
-            error.statusCode=422;
-            throw error;
+            return res.status(422).json({message:"No Record find with this id , Please use different id..."});
+            // const error=new Error('No data find with this id,Use different one');
+            // error.statusCode=422;
+            // throw error;
         }
         return res.status(200).json({
             message:'User deleted successfull...',
@@ -390,14 +392,11 @@ module.exports.TicketBooking=async (req,res,next)=>{
                 Authorization:req.signature
             }
         });
-        if(response===null){
-            const error=new Error('OOPS!! error occured Please try again');
-            error.statusCode=422;
-            throw error;
-        }
         return res.status(200).json(response.data);
     }
     catch(error){
+        error.message=error.response.data.message;
+        error.statusCode=error.response.status;
         if(!error.statusCode){
             error.statusCode=500;
         }
@@ -427,14 +426,11 @@ module.exports.CancelTicket=async(req,res,next)=>{
                 Authorization:req.signature
             }
         });
-        if(response===null){
-            const error=new Error('OOPS!! error occured Please try again');
-            error.statusCode=422;
-            throw error;
-        }
         return res.status(200).json(response.data);
     }
     catch(error){
+        error.message=error.response.data.message;
+        error.statusCode=error.response.status;
         if(!error.statusCode){
             error.statusCode=500;
         }
@@ -447,18 +443,21 @@ module.exports.CheckingTicketBooking=async(req,res,next)=>{
     try{
         // requesting parameters
         const ticketId=req.params.id;
+        let response;
         // cross api call throws error if response is null
-        const response=await axios.get(`${API_PATH}/booking-details/${ticketId}`,{
-            headers:{
-                Autherization:req.signature
-            }
-        });
-        if(!response){
-            const error=new Error('OOPS!! error occured No response get ');
-            error.statusCode=422;
+        try{
+             response=await axios.get(`${API_PATH}/booking-details/${ticketId}`,{
+                headers:{
+                    Autherization:req.signature
+                }
+            });
+            return res.status(200).json(response.data);
+        }
+        catch(error){
+            error.message=error.response.data.message;
+            error.statusCode=error.response.status;
             throw error;
         }
-        return res.status(200).json(response.data);
     }
     catch(error){
         if(!error.statusCode){
@@ -495,42 +494,56 @@ module.exports.SearchingByParameter=async(req,res,next)=>{
     }
 
     catch(error){
+        error.message=error.response.data.message;
+        error.statusCode=error.response.status;
         if(!error.statusCode){
             error.statusCode=500;
         }
         next(error);
     }
 }
-// // finding event according by price
-// module.exports.FindByPrice= async(req,res,next)=>{
-//     try{
-//           const price=req.query.price;
-//           const page=req.query.page ||1;
 
-//           if(price===null ||price===undefined){
-//             const error =new Error('Searching parameters are empty');
-//             error.statusCode=422;
-//             throw error;
-//           }
-//           const response=await axios.post(`http://localhost:3002/searcheventbyprice`,{
-//             price:price,
-//             page:page
-//           });
-//           if(!response){
-//             // console.log('inside response failed');
-//             const error=new Error('OOPS!! error occured No response get ');
-//             error.statusCode=422;
-//             throw error;
-//         }
-//         return res.status(200).json(response.data);
-//     }
 
-//     catch(error){
-//         if(!error.statusCode){
-//             error.statusCode=500;
-//         }
-//         next(error);
-//     }
-// }
-
+module.exports.GenerateFakeData=async (req,res,next)=>{
+    try{
+        for(let i=0;i<100000;++i){
+            const address=new Address({
+                city:faker.address.cityName(),
+                country:faker.address.country(),
+                state:faker.address.state(),
+                pincode:faker.address.zipCode(),
+                streetName:faker.address.streetAddress(),
+                countryCode:faker.address.countryCode()
+            });
+            const addressResult=await address.save();
+            const {otp,expiry}=await GenerateOtp();
+            const salt=await GenerateSalt();
+            const userPassword=await GeneratePassword('testing123',salt);
+            const user=new User({
+                email:faker.internet.email(),
+                password:userPassword,
+                address:address,
+                otp:otp,
+                otp_expiry:expiry,
+                name: faker.internet.userName(),
+                phone:faker.phone.number(),
+                salt:salt,
+                verified:true,
+            }); 
+            const userResult=await user.save();
+         }
+        // let resultArray=[];
+        // Array.from({length:1}).forEach(()=>{
+        //    return resultArray.push(createRandomData());
+        // })
+        // console.log(resultArray);
+         return res.status(200).json({message:'Data created successfull'});
+    }   
+    catch(error){
+        if(!error.statusCode){
+            error.statusCode=500;
+        }
+        next(error);
+    }
+}
 

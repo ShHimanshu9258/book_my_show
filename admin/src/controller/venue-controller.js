@@ -357,9 +357,10 @@ module.exports.CancelTicketBooking= async(req,res,next)=>{
         const {noOfTickets,user,bookingId}=req.body;
         // throws error if no event find
         if(!event){
-            const error=new Error('No Event find with this id');
-            error.statusCode=422;
-            throw error;
+            // const error=new Error('No Event find with this id');
+            // error.statusCode=422;
+            // throw error;
+            return res.status(422).json({message:'No Event find with this id'});
         }
         const cancelBooking=await CancelBooking({
             email:user.email,
@@ -370,24 +371,26 @@ module.exports.CancelTicketBooking= async(req,res,next)=>{
             noOfTickets:noOfTickets
         });
         const cancelBookingResult=await cancelBooking.save();
+        console.log('Pass from cancelBookingResult');
         // throws error if cancel ticket booking is failed
         if(!cancelBookingResult){
-            const error=new Error('OOPS!! Error occured ticket not booked..');
-            error.statusCode=422;
-            throw error;
+            // const error=new Error('OOPS!! Error occured ticket not booked..');
+            return res.status(422).json({message:'OOPS!! Error occured ticket not booked..'});
+            // error.statusCode=422;
+            // throw error;
         }
-        console.log(event);
         event.remaningAvailableSeats=event.remaningAvailableSeats+noOfTickets;
-        //event.cancelBooking.push(cancelBookingResult._id);
         const eventResult=await event.save();
-        console.log(eventResult);
-        await RemoveDataById(bookingId,BookingModel);
+        console.log('Pass from remaningAvailableSeats');
+        const bookingDetails=await BookingModel.findById(bookingId);
+        bookingDetails.bookingStatus= !bookingDetails.bookingStatus;
+
+        await bookingDetails.save();
+        console.log('Pass from bookingDetails');
         if(!eventResult){
             // removing data from cancel booking table 
             await RemoveDataById(cancelBookingResult._id,CancelBooking);
-            const error=new Error("OOPS!! Error occured your ticket booking is not canceld");
-            error.statusCode=422;
-            throw error;
+            return res.status(422).json({message:"OOPS!! Error occured your ticket booking is not canceld"});
         }
         return res.status(200).json({
             message:'Congratulation your ticket canceld is confirmed',
@@ -405,13 +408,15 @@ module.exports.CancelTicketBooking= async(req,res,next)=>{
 module.exports.FetchingTicketBookingDetails=async(req,res,next)=>{
     try{
         // fetching data by id
-        const bookingDetails=await BookingModel.findOne({_id:req.params.id});
+        const bookingDetails=await BookingModel.findOne({_id:req.params.id,bookingStatus:true});
+        
+        if(!bookingDetails){
+            return res.status(422).json({message:'OOPS!! Error occured '});
+        }
         // fetching event details from event table
         const event=await GetDataById(bookingDetails.eventId[0],Event);
-        if(!bookingDetails && !event){
-            const error=new Error('Booking details not fetched with this id..');
-            error.statusCode=422;
-            throw error;
+        if(!event){
+            return res.status(422).json({message:'Event details not fetched with this id..'});
         }
         return res.status(200).json({
             message:'Fetching details successfull...',
@@ -421,7 +426,8 @@ module.exports.FetchingTicketBookingDetails=async(req,res,next)=>{
             venueName:event.event,
             venueType:event.venueType,
             timing:event.timing,
-            ticketPrice:event.ticketPrice
+            ticketPrice:event.ticketPrice,
+            bookingStatus:bookingDetails.bookingStatus
         });
     }
     catch(error){
@@ -435,24 +441,29 @@ module.exports.FetchingTicketBookingDetails=async(req,res,next)=>{
 module.exports.SearchingByParameter=async(req,res,next)=>{
     try{
         // requested paramaters
-        const filters=req.query.search;
+        let filters=req.query.search?req.query.search.trim():'';
+        // if(filters){
+        //     filters=filters.trim();
+        // }
+         if(!filters){
+            return res.status(404).json({message:"OOPS!! error occured no result found"});
+        }
         const page=req.query.page ||1;
-        console.log(filters);
+        // console.log(typeof filters);
+        // console.log(filters);
+        // console.log(filters.trim()==="Pushpa:Chapter1");
         // fetching details
         const result=await Event.find({
             $or :[
-                {ticketPrice:{$lte:filters}},
-                { event: { $regex: /filters/ , $options: 'i'} },
-                { venueType: { '$regex': filters, $options: 'i' } },
+                {ticketPrice:{$regex:filters}},
+                { event: {'$regex':filters , $options:'i'} },
+                { venueType: {'$regex':filters,$options:'i'} },
                 {venueLocation:{'$elemMatch':{city:filters} }}
             ]
-        })
-        // console.log(result);
-        if(result.length<=0){
-            const error=new Error('OOPS!! No data found');
-            error.statusCode=422;
-            throw error;
-        }
+        }).sort({ createdAt: -1 })
+        .skip((page - 1) * RECORDS_PER_PAGE)
+        .limit(RECORDS_PER_PAGE);
+        
         return res.status(200).json(result);
     }
     catch(error){
@@ -485,63 +496,4 @@ module.exports.FindEventByPrice=async(req,res,next)=>{
         throw error;
     }
 }
-
-// // fetching data by price
-// module.exports.FindEventByPrice=async(req,res,next)=>{
-//     try{
-//         // requested parameters
-//         let {price}=req.body;
-//         let page = req.body.page||1;
-//         // fetchings events
-//         const result=await Event.find();
-//         // throws error if record failed
-//         if(!result){
-//             const error=new Error('No Data found...');
-//             error.statusCode=422;
-//             throw error;
-//         }
-//          let resultArray=[];
-//          // storing data in resultArray if records are lower then requested price
-//          resultArray=result.filter(event=>{
-//             if(event.ticketPrice<=price){
-//                return resultArray.push(event);
-//             }
-//         });
-//         // throws error if records are not find
-//         if(!resultArray){
-//             const error=new Error('No Data found...');
-//             error.statusCode=422;
-//             throw error;
-//         }
-//         let start=(page-1)*RECORDS_PER_PAGE;
-//         let index=0;
-//         let recordArray=[];
-//         record=(page*RECORDS_PER_PAGE);
-//         // adding pagination
-//         for(let i=start;i<record;i++){
-//             if(record.length<resultArray.length){
-//                 recordArray[index]=resultArray[i];
-//                 // recordArray.push(resultArray[i])
-//                 ++index;
-//             }
-//             else{ 
-//                 if(resultArray.length<10 && resultArray.length>index){
-//                     recordArray[index]=resultArray[i];
-//                     ++index;
-//                     continue;
-//                 }
-//                 else{
-//                     break;
-//                 }
-//             }
-//         }
-//         return res.status(200).json(recordArray);
-//     }
-//     catch(error){
-//         if(!error.statusCode){
-//             error.statusCode=500;
-//         }
-//         next(error);
-//     }
-// }
 

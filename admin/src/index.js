@@ -22,17 +22,18 @@ app.use(AdminRoutes);
 app.use(VenueAdminRoutes);
 
 
-// handling global errors
+// error handling middleware
+
 app.use((error, req, res, next) => {
-    const status = error.statusCode || 500;
-    const message = error.message;
-    const data = error.data;
-    res.status(status).json({
-       message: message,
-      data: data,
-      status:status
+  const status = error.statusCode || 500;
+  const message = error.message;
+  console.log(message);
+  return res.status(status).json({ 
+    message: message,
+    status:status
    });
-  });
+
+})
 
   
   // handling page not found and some url mismatch errors
